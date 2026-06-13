@@ -4,304 +4,460 @@
 
 @section('content')
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+    
     /* ====================================================
-       TEMA & VARIABEL WARNA (DARK/LIGHT MODE)
+       PENGATURAN VARIABEL WARNA (PREMIUM MIDNIGHT NAVY)
        ==================================================== */
     :root {
-        --bg-main: #0f172a; --text-main: #ffffff; --text-muted: #94a3b8;
-        --card-bg: rgba(255, 255, 255, 0.02); --card-border: rgba(255, 255, 255, 0.05);
-        --card-hover-bg: rgba(255, 255, 255, 0.04);
-        --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 212, 255, 0.1);
-        --banner-bg: linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(26, 33, 62, 0.8) 100%);
-        --list-bg: rgba(255, 255, 255, 0.03); 
-        
-        /* TICKER COLORS DARK */
-        --ticker-bg: linear-gradient(90deg, #0b1121 0%, #1e293b 50%, #0b1121 100%);
-        --ticker-border: #00d4ff;
+        --color-background-primary: #0a0f1d;     /* Deep Midnight Cyber Blue */
+        --color-background-secondary: #0f172a;   /* Navy Blue Card Base */
+        --color-text-primary: #ffffff;
+        --color-text-secondary: #94a3b8;         /* Warna abu-abu terang untuk mode malam */
+        --color-border-secondary: rgba(0, 212, 255, 0.16);
+        --color-border-tertiary: rgba(0, 212, 255, 0.06);
+        --border-radius-lg: 16px;
+        --border-radius-md: 12px;
+        --font-sans: 'Inter', system-ui, sans-serif;
+        --ticker-bg: #070a14;
+        --ticker-border: rgba(0, 212, 255, 0.3);
+        --accent-cyan: #00d4ff;                  /* Cyan Utama */
     }
 
-    [data-theme="light"] {
-        --bg-main: #f8fafc; --text-main: #0f172a; --text-muted: #64748b;
-        --card-bg: rgba(255, 255, 255, 1); --card-border: rgba(0, 0, 0, 0.08);
-        --card-hover-bg: #ffffff;
-        --card-shadow: 0 15px 35px rgba(0, 0, 0, 0.05), 0 0 15px rgba(0, 212, 255, 0.15);
-        --banner-bg: linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(255, 255, 255, 0.9) 100%);
-        --list-bg: rgba(0, 0, 0, 0.02); 
-        
-        /* TICKER COLORS LIGHT */
-        --ticker-bg: linear-gradient(90deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%);
-        --ticker-border: #00d4ff;
+    [data-theme="light"], .light {
+        --color-background-primary: #f1f5f9;    
+        --color-background-secondary: #ffffff;  
+        --color-text-primary: #0f172a;           
+        --color-text-secondary: #64748b;         
+        --color-border-secondary: rgba(15, 23, 42, 0.14);
+        --color-border-tertiary: rgba(15, 23, 42, 0.05);
+        --ticker-bg: #e2e8f0;
+        --ticker-border: #0284c7;
+        --accent-cyan: #0284c7;                  
     }
 
-    .dashboard-wrapper {
-        background-color: var(--bg-main); color: var(--text-main);
-        transition: background-color 0.5s ease, color 0.5s ease;
-        min-height: 100vh; position: relative; overflow-x: hidden;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    .D {
+        font-family: 'Space Grotesk', var(--font-sans);
+        background: var(--color-background-primary);
+        border: 0.5px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-lg);
+        overflow-x: hidden;
+        overflow-y: visible; 
+        transition: background 0.3s, border-color 0.3s, color 0.3s;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
     }
-
-
-    /* --- 1. LIVE TICKER ANIMATION (VERSI JUMBO & CENTERED) --- */
-    .ticker-wrap {
-        width: 100%; overflow: hidden; 
-        background: var(--ticker-bg);
-        border-bottom: 3px solid var(--ticker-border); 
-        border-top: 1px solid rgba(0, 212, 255, 0.2); 
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 25px rgba(0, 212, 255, 0.2);
-        padding: 25px 0; /* Padding ideal */
-        white-space: nowrap; 
-        position: relative;
-        z-index: 10;
-        display: flex;           /* Kunci agar teks di tengah */
-        align-items: center;     /* Kunci agar teks di tengah */
-    }
-    .ticker-content {
-        display: inline-flex;    /* Flexbox untuk menyejajarkan teks & ikon */
+    
+    /* TOPBAR & LAYERING TITLE OPTIMIZATION */
+    .topbar { 
+        display: flex; 
         align-items: center; 
-        animation: ticker 40s linear infinite; 
-        font-size: 1.25rem; 
-        font-weight: 800; 
-        color: var(--text-main);
+        justify-content: space-between; 
+        padding: 24px 28px; 
+        border-bottom: 0.5px solid var(--color-border-tertiary); 
+        background: var(--color-background-secondary); 
+    }
+    .topbar-title-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    .page-badge {
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--accent-cyan);
+        text-transform: uppercase;
         letter-spacing: 1.5px;
+        line-height: 1;
     }
-    .ticker-content:hover { animation-play-state: paused; cursor: pointer; }
-    @keyframes ticker { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
+    .page-title-premium {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--color-text-primary);
+        letter-spacing: -0.5px;
+        line-height: 1.2;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .page-title-separator {
+        color: var(--color-border-secondary);
+        font-weight: 300;
+    }
+    .page-title-user {
+        color: var(--accent-cyan);
+        font-weight: 500;
+    }
+    .top-right { display: flex; align-items: center; gap: 14px; }
     
-    .ticker-item { 
-        display: inline-flex;   /* Memastikan ikon dan teks sejajar rapi */
+    /* BUTTONS STYLE */
+    .btn-sm { font-family: inherit; font-size: 12px; padding: 8px 18px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: transparent; color: var(--color-text-primary); cursor: pointer; font-weight: 600; transition: all 0.2s ease; }
+    .btn-sm:hover { background: rgba(0, 212, 255, 0.08); border-color: var(--accent-cyan); }
+    .btn-accent { border: none; background: var(--accent-cyan); color: #0a0f1d; font-weight: 700; box-shadow: 0 4px 14px rgba(0, 212, 255, 0.18); }
+    [data-theme="light"] .btn-accent { color: #ffffff; }
+    .btn-accent:hover { background: #00bfe6; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0, 212, 255, 0.28); }
+    
+    .icon-btn { width: 36px; height: 34px; display: flex; align-items: center; justify-content: center; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); cursor: pointer; color: var(--color-text-secondary); background: transparent; transition: all 0.2s; }
+    .icon-btn:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); background: rgba(0, 212, 255, 0.05); }
+    
+    /* CONTAINER & GRID LAYOUT CONTAINER */
+    .body { padding: 28px; display: flex; flex-direction: column; gap: 26px; }
+    .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+    .stat { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 20px; border: 0.5px solid var(--color-border-tertiary); transition: transform 0.2s, border-color 0.2s; }
+    .stat:hover { border-color: rgba(0, 212, 255, 0.25); transform: translateY(-2px); }
+    
+    /* PERBAIKAN: Mengubah var(--text-secondary) menjadi var(--color-text-secondary) agar kelihatan di mode malam */
+    .stat-label { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: .9px; margin-bottom: 12px; display: flex; align-items: center; gap: 7px; font-weight: 700; }
+    .stat-label i { color: var(--accent-cyan); font-size: 14px; }
+    .stat-val { font-size: 32px; font-weight: 700; color: var(--color-text-primary); line-height: 1.2; font-family: 'Space Grotesk', sans-serif; }
+    .stat-delta { font-size: 11px; margin-top: 10px; display: flex; align-items: center; gap: 4px; font-weight: 500; font-family: var(--font-sans); }
+    .up { color: #10b981; } .down { color: #ef4444; }
+    
+    /* PANEL UTAMA & SIDEBAR SIZING */
+    .mid-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 26px; }
+    .card { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; transition: background 0.3s; }
+    .card-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+    .card-title { font-size: 14px; font-weight: 700; color: var(--color-text-primary); tracking-wide; line-height: 1.4; }
+    .card-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; font-family: var(--font-sans); line-height: 1.4; }
+    
+    /* BADGES */
+    .badge { font-size: 10px; padding: 4px 10px; border-radius: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+    .b-teal { background: rgba(0, 212, 255, 0.1); color: var(--accent-cyan); border: 0.5px solid rgba(0, 212, 255, 0.15); }
+    .b-amber { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 0.5px solid rgba(245, 158, 11, 0.15); }
+    .b-red { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 0.5px solid rgba(239, 68, 68, 0.15); }
+    .b-purple { background: rgba(99, 102, 241, 0.1); color: #6366f1; border: 0.5px solid rgba(99, 102, 241, 0.15); }
+    
+    /* PERFECT ALIGNED RANKING TABLE */
+    .rank-list { padding: 6px 0; }
+    .rank-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) 75px 160px; align-items: center; gap: 18px; padding: 16px 22px; border-bottom: 0.5px solid var(--color-border-tertiary); transition: background 0.2s; }
+    .rank-row:hover { background: rgba(255, 255, 255, 0.015); }
+    .rank-row:last-child { border-bottom: none; }
+    
+    /* PERBAIKAN: var(--color-text-secondary) */
+    .rn { font-size: 15px; font-weight: 700; color: var(--color-text-secondary); text-align: center; }
+    .rn.gold { color: #f59e0b; font-size: 16px; }
+    .asset-name { font-size: 14px; font-weight: 600; color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.4; }
+    .asset-game { font-size: 11px; color: var(--color-text-secondary); margin-top: 5px; display: flex; align-items: center; gap: 6px; font-family: var(--font-sans); }
+    
+    .score-num { font-size: 14px; font-weight: 700; color: var(--color-text-primary); text-align: right; font-family: monospace; }
+    .bar-bg { height: 8px; background: var(--color-background-primary); border-radius: 5px; overflow: hidden; border: 0.5px solid var(--color-border-tertiary); }
+    .bar-fill { height: 100%; border-radius: 5px; background: var(--accent-cyan); width: 0; transition: width 1.2s cubic-bezier(.4,0,.2,1); box-shadow: 0 0 8px rgba(0, 212, 255, 0.4); }
+    .bar-fill.am { background: #f59e0b; box-shadow: 0 0 8px rgba(245, 158, 11, 0.4); }
+    
+    /* CRITERIA & SIDE PANEL ROWS */
+    .side-panel { display: flex; flex-direction: column; gap: 26px; }
+    .crit-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+    .crit-row:last-child { border-bottom: none; }
+    .crit-icon { width: 30px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .crit-icon i { font-size: 15px; }
+    .crit-name { font-size: 13px; color: var(--color-text-primary); flex: 1; min-width: 0; font-weight: 500; line-height: 1.4; }
+    .crit-type { font-size: 10px; padding: 2px 7px; border-radius: 6px; font-weight: 600; }
+    .crit-w { font-size: 12px; font-weight: 700; color: var(--color-text-primary); min-width: 38px; text-align: right; font-family: monospace; }
+    
+    .alert-row { display: flex; align-items: flex-start; gap: 14px; padding: 14px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+    .alert-row:last-child { border-bottom: none; }
+    .alert-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+    .alert-text { font-size: 12px; color: var(--color-text-primary); line-height: 1.5; font-family: var(--font-sans); }
+    .alert-time { font-size: 10px; color: var(--color-text-secondary); margin-top: 5px; font-weight: 500; }
+    
+    /* BOTTOM VISUAL CHARTS */
+    .bottom-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; }
+    .mini-chart { padding: 22px 20px; }
+    .chart-bars { display: flex; align-items: flex-end; gap: 12px; height: 100px; border-bottom: 1px solid var(--color-border-secondary); padding-bottom: 2px; }
+    .cbar { flex: 1; border-radius: 4px 4px 0 0; min-width: 0; transition: height 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+    .chart-labels { display: flex; gap: 12px; margin-top: 10px; }
+    
+    /* PERBAIKAN: var(--color-text-secondary) */
+    .clabel { flex: 1; font-size: 10px; color: var(--color-text-secondary); text-align: center; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+    
+    .progress-ring { display: flex; align-items: center; justify-content: center; padding: 14px; }
+    .ring-wrap { position: relative; width: 110px; height: 110px; }
+    .ring-wrap svg { width: 110px; height: 110px; transform: rotate(-90deg); }
+    .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .ring-val { font-size: 26px; font-weight: 700; color: var(--color-text-primary); }
+    
+    /* PERBAIKAN: var(--color-text-secondary) */
+    .ring-label { font-size: 10px; color: var(--color-text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.3px; }
+    .ring-info { flex: 1; padding: 14px 18px 14px 0; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+    
+    /* PERBAIKAN: Ditambahkan pewarnaan teks dasar agar angka persentase ring bursa di kanan terwarnai terang di mode malam */
+    .ri-row { display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-family: var(--font-sans); color: var(--color-text-secondary); }
+    .ri-dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 10px; flex-shrink: 0; }
+
+    /* RUNNING TICKER BAR */
+    .ticker-wrap { 
+        width: 100%; 
+        overflow: hidden; 
+        background: var(--ticker-bg); 
+        border-bottom: 2px solid var(--ticker-border); 
+        padding: 18px 0; 
+        display: flex; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .ticker-content { 
+        display: flex; 
+        width: max-content; 
+        animation: marquee 35s linear infinite; 
+        white-space: nowrap; 
+    }
+    .ticker-content:hover { animation-play-state: paused; }
+    .ticker-group { 
+        display: flex; 
         align-items: center; 
-        padding: 0 4rem; 
+        flex-wrap: nowrap; 
     }
-
-    /* --- 2. AMBIENT GLOW --- */
-    .ambient-glow {
-        position: absolute; top: -10%; right: -5%; width: 600px; height: 600px;
-        background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
-        border-radius: 50%; z-index: 0; pointer-events: none;
-        animation: pulseGlow 8s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+    .ticker-item { 
+        display: inline-flex; 
+        align-items: center; 
+        gap: 10px;                    
+        padding: 0 4rem;              
+        font-size: 1.05rem;           
+        font-weight: 700; 
+        color: var(--color-text-primary); 
+        letter-spacing: 0.6px;
+        line-height: 1.5; 
+        white-space: nowrap;          
     }
-    @keyframes pulseGlow { 0% { transform: scale(0.8); opacity: 0.5; } 100% { transform: scale(1.2); opacity: 1; } }
-
-    @keyframes fadeInUp { 0% { opacity: 0; transform: translateY(30px); } 100% { opacity: 1; transform: translateY(0); } }
-    .animate-entrance { opacity: 0; animation: fadeInUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; z-index: 1; position: relative; }
-
-    .welcome-banner { background: var(--banner-bg); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 24px; position: relative; overflow: hidden; }
-    .welcome-banner::before { content: ''; position: absolute; top: 0; left: 0; width: 6px; height: 100%; background: linear-gradient(180deg, #00d4ff 0%, #4dabf7 100%); }
-
-    .modern-widget {
-        background: var(--card-bg); backdrop-filter: blur(16px);
-        border: 1px solid var(--card-border); border-radius: 16px;
-        transition: all 0.3s ease; color: var(--text-main); display: flex; flex-direction: column;
-    }
-    .modern-widget:hover { 
-        transform: translateY(-4px); 
-        border-color: rgba(0, 212, 255, 0.3); 
-        box-shadow: 0 8px 24px rgba(0, 212, 255, 0.1);
-    }
-
-    .widget-header-icon { width: 45px; height: 45px; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 1.2rem; }
-    .icon-gold { background: rgba(255, 193, 7, 0.15); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.2); }
-    .icon-cyan { background: rgba(0, 212, 255, 0.15); color: #00d4ff; border: 1px solid rgba(0, 212, 255, 0.2); }
-    .icon-blue { background: rgba(13, 110, 253, 0.15); color: #4dabf7; border: 1px solid rgba(13, 110, 253, 0.2); }
-
-    .score-display { font-size: 3rem; font-weight: 800; line-height: 1; background: linear-gradient(90deg, #ffc107, #ff9800); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    
-    .activity-list { padding: 0; margin: 0; list-style: none; }
-    .activity-item { background: var(--list-bg); border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; align-items: center; font-size: 0.85rem; }
-    .activity-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 12px; flex-shrink: 0; }
-
-    .btn-interactive { border-radius: 12px; font-weight: 600; padding: 10px 20px; transition: all 0.2s ease; }
-    .btn-interactive:hover { transform: translateY(-2px); }
-
-    .theme-toggle-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); transition: all 0.2s ease; }
-    .theme-toggle-btn:hover { background: rgba(0, 212, 255, 0.1); border-color: #00d4ff; }
-    .mini-stat { background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); border-radius: 16px; padding: 12px 20px; }
-
-    /* --- 3. FLOATING ACTION BUTTON (FAB) --- */
-    .fab-btn {
-        position: fixed; bottom: 40px; right: 40px; width: 65px; height: 65px;
-        border-radius: 50%; display: flex; align-items: center; justify-content: center;
-        background: linear-gradient(135deg, #00d4ff, #4dabf7); color: #000;
-        box-shadow: 0 10px 25px rgba(0, 212, 255, 0.4); z-index: 1050;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: none; cursor: pointer;
-    }
-    .fab-btn:hover { transform: scale(1.1) rotate(90deg); box-shadow: 0 15px 35px rgba(0, 212, 255, 0.6); }
-
-    .modal-content-custom { background: var(--bg-main); color: var(--text-main); border: 1px solid var(--card-border); border-radius: 20px; box-shadow: var(--card-shadow); }
-    .modal-header-custom { border-bottom: 1px solid var(--card-border); }
+    .ticker-item i { font-size: 18px; display: inline-block; line-height: 1; }
+    @keyframes marquee { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
 </style>
 
-<div class="dashboard-wrapper d-flex flex-column">
+<div class="D">
 
-    <div class="ticker-wrap">
-        <div class="ticker-content">
-            <div class="ticker-item"><i class="bi bi-currency-bitcoin text-warning fs-3 me-2"></i> Bitcoin (BTC) <span class="ms-3">$64,230</span> <span class="text-success ms-3"><i class="bi bi-caret-up-fill me-1"></i>2.4%</span></div>
-            <div class="ticker-item"><i class="bi bi-gem text-info fs-3 me-2"></i> CS:GO Dragon Lore <span class="ms-3">$8,500</span> <span class="text-success ms-3"><i class="bi bi-caret-up-fill me-1"></i>0.5%</span></div>
-            <div class="ticker-item"><i class="bi bi-box text-secondary fs-3 me-2"></i> Ethereum (ETH) <span class="ms-3">$3,450</span> <span class="text-danger ms-3"><i class="bi bi-caret-down-fill me-1"></i>1.2%</span></div>
-            <div class="ticker-item"><i class="bi bi-controller text-primary fs-3 me-2"></i> Axie Infinity (AXS) <span class="ms-3">$45.20</span> <span class="text-success ms-3"><i class="bi bi-caret-up-fill me-1"></i>5.1%</span></div>
-            
-            <div class="ticker-item"><i class="bi bi-currency-bitcoin text-warning fs-3 me-2"></i> Bitcoin (BTC) <span class="ms-3">$64,230</span> <span class="text-success ms-3"><i class="bi bi-caret-up-fill me-1"></i>2.4%</span></div>
-            <div class="ticker-item"><i class="bi bi-gem text-info fs-3 me-2"></i> CS:GO Dragon Lore <span class="ms-3">$8,500</span> <span class="text-success ms-3"><i class="bi bi-caret-up-fill me-1"></i>0.5%</span></div>
+    <div class="main">
+        
+        <div class="topbar">
+            <div class="topbar-title-wrapper">
+                <span class="page-badge">In-Game Asset Investment Analytics Hub</span>
+                <h1 class="page-title-premium">
+                         DASHBOARD 
+                    <span class="page-title-separator">|</span> 
+                    <span class="page-title-user">{{ Auth::user()->name }}</span>
+                </h1>
+            </div>
+            <div class="top-right">
+                <div class="icon-btn" id="themeToggle" title="Ubah Tema"><i class="ti ti-sun" id="themeIcon" aria-hidden="true"></i></div>
+                <div class="icon-btn" onclick="window.location.reload();" title="Refresh Data"><i class="ti ti-refresh" aria-hidden="true"></i></div>
+                <a href="{{ route('dashboard.exportPdf') }}" class="btn-sm text-decoration-none text-center d-inline-flex align-items-center">
+                    Export PDF
+                </a>
+                <a href="{{ route('aset-digital.index') }}" class="btn-sm btn-accent text-decoration-none d-inline-flex align-items-center gap-1">
+                    <i class="ti ti-plus" style="font-size:11px;" aria-hidden="true"></i> Aset Baru ↗
+                </a>
+            </div>
         </div>
-    </div>
 
-    <div class="p-4 p-lg-5 flex-grow-1 position-relative">
-        <div class="ambient-glow"></div>
-        <div class="container z-index-1 position-relative">
-            
-            <div class="d-flex justify-content-end mb-4 animate-entrance" style="animation-delay: 0.05s;">
-                <button id="themeToggle" class="btn theme-toggle-btn rounded-pill px-4 py-2 shadow-sm fw-bold">
-                    <i class="bi bi-sun-fill text-warning me-2" id="themeIcon"></i> <span id="themeText">Mode Terang</span>
-                </button>
+        <div class="ticker-wrap">
+            <div class="ticker-content">
+                <div class="ticker-group">
+                    <div class="ticker-item"><i class="ti ti-currency-bitcoin text-warning"></i> Bitcoin (BTC) <span class="text-info">$64,230</span> <span class="text-success">▲ 2.4%</span></div>
+                    <div class="ticker-item"><i class="ti ti-diamond text-info"></i> CS:GO Dragon Lore <span class="text-info">$8,500</span> <span class="text-success">▲ 0.5%</span></div>
+                    <div class="ticker-item"><i class="ti ti-currency-ethereum text-secondary"></i> Ethereum (ETH) <span class="text-info">$3,450</span> <span class="text-danger">▼ 1.2%</span></div>
+                    <div class="ticker-item"><i class="ti ti-device-gamepad text-primary"></i> Axie Infinity (AXS) <span class="text-info">$45.20</span> <span class="text-success">▲ 5.1%</span></div>
+                </div>
+                <div class="ticker-group">
+                    <div class="ticker-item"><i class="ti ti-currency-bitcoin text-warning"></i> Bitcoin (BTC) <span class="text-info">$64,230</span> <span class="text-success">▲ 2.4%</span></div>
+                    <div class="ticker-item"><i class="ti ti-diamond text-info"></i> CS:GO Dragon Lore <span class="text-info">$8,500</span> <span class="text-success">▲ 0.5%</span></div>
+                    <div class="ticker-item"><i class="ti ti-currency-ethereum text-secondary"></i> Ethereum (ETH) <span class="text-info">$3,450</span> <span class="text-danger">▼ 1.2%</span></div>
+                    <div class="ticker-item"><i class="ti ti-device-gamepad text-primary"></i> Axie Infinity (AXS) <span class="text-info">$45.20</span> <span class="text-success">▲ 5.1%</span></div>
+                </div>
             </div>
+        </div>
 
-            <div class="row mb-5 animate-entrance" style="animation-delay: 0.1s;">
-                <div class="col-12">
-                    <div class="welcome-banner p-4 p-md-5 shadow-lg d-flex flex-column flex-lg-row align-items-lg-center justify-content-between">
-                        <div class="mb-4 mb-lg-0">
-                            <span class="badge bg-info text-dark px-3 py-2 mb-3 rounded-pill tracking-wider fw-bold shadow-sm">
-                                <i class="bi bi-rocket-takeoff me-1"></i> SPK Panel
-                            </span>
-                            <h1 class="display-5 fw-bolder mb-2" style="color: var(--text-main);">Selamat Datang, <span class="text-info">{{ Auth::user()->name }}</span>! 👋</h1>
-                            <p class="lead mb-0" style="color: var(--text-muted); max-width: 600px;">
-                                Pusat analitik algoritma TOPSIS. Pantau ringkasan performa investasi dan unduh laporan terbaru Anda di sini.
-                            </p>
-                        </div>
-                        <div class="d-flex gap-3">
-                            <div class="mini-stat text-center">
-                                <h3 class="fw-bold text-info mb-0">{{ $totalKriteria }}</h3>
-                                <small style="color: var(--text-muted);">Kriteria Aktif</small>
-                            </div>
-                            <div class="mini-stat text-center">
-                                <h3 class="fw-bold text-success mb-0">{{ $totalAsetDigital }}</h3>
-                                <small style="color: var(--text-muted);">Aset Dianalisis</small>
-                            </div>
-                        </div>
+        <div class="body">
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-label"><i class="ti ti-layers-subtract" aria-hidden="true"></i> Total Aset</div>
+                    <div class="stat-val">{{ $totalAsetDigital }}</div>
+                    <div class="stat-delta up"><i class="ti ti-arrow-up" style="font-size:10px;" aria-hidden="true"></i> Terdaftar aktif</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label"><i class="ti ti-star" aria-hidden="true"></i> Skor Tertinggi</div>
+                    <div class="stat-val font-mono" style="color: #f59e0b;">
+                        {{ $asetTerbaik ? number_format($asetTerbaik['preferensi'], 3) : '0.847' }}
+                    </div>
+                    <div class="stat-delta text-truncate" style="color:var(--color-text-secondary); display:block; max-width:180px;" title="{{ $asetTerbaik ? $asetTerbaik['nama_aset'] : 'Dragon Lore' }}">
+                        {{ $asetTerbaik ? $asetTerbaik['nama_aset'] : 'Dragon Lore' }}
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label"><i class="ti ti-activity" aria-hidden="true"></i> Volume 24 Jam</div>
+                    <div class="stat-val">$18.2K</div>
+                    <div class="stat-delta up"><i class="ti ti-trending-up" style="font-size:10px;" aria-hidden="true"></i> +12.4%</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label"><i class="ti ti-clock" aria-hidden="true"></i> Matriks Penilaian</div>
+                    <div class="stat-val">{{ $totalPenilaian }}</div>
+                    @php
+                        $maxPenilaian = $totalKriteria * $totalAsetDigital;
+                        $persentase = $maxPenilaian > 0 ? round(($totalPenilaian / $maxPenilaian) * 100, 0) : 0;
+                    @endphp
+                    <div class="stat-delta {{ $persentase == 100 ? 'up' : 'text-warning' }} fw-bold">
+                        {{ $persentase }}% Terisi[cite: 2]
                     </div>
                 </div>
             </div>
 
-            <!-- Summary Statistics Cards -->
-            <div class="row g-4 mb-5 animate-entrance" style="animation-delay: 0.15s;">
-                <!-- Total Kriteria -->
-                <div class="col-md-6 col-lg-4">
-                    <div class="card modern-widget p-4 h-100">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div class="mid-grid">
+                <div class="card">
+                    <div class="card-head">
+                        <div>
+                            <div class="card-title">Ranking Investasi Aset In-Game</div>
+                            <div class="card-sub">Diurutkan berdasarkan nilai kedekatan relatif solusi ideal ($V_i$)[cite: 2]</div>
+                        </div>
+                        <span class="badge b-teal">Live</span>
+                    </div>
+                    <div class="rank-list">
+                        <div class="rank-row">
+                            <div class="rn gold">01</div>
                             <div>
-                                <p class="mb-2 small fw-semibold" style="color: #00d4ff; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.8rem;">Kriteria</p>
-                                <h3 class="fw-bold mb-0" style="font-size: 2.2rem; color: var(--text-main);">{{ $totalKriteria }}</h3>
+                                <div class="asset-name">{{ $asetTerbaik ? $asetTerbaik['nama_aset'] : 'Dragon Lore AK-47' }}</div>
+                                <div class="asset-game">Counter-Strike 2 · <span class="badge b-amber">Solusi Utama</span></div>
                             </div>
-                            <div class="widget-header-icon icon-cyan" style="font-size: 1.5rem;">
-                                <i class="bi bi-sliders"></i>
-                            </div>
+                            <div class="score-num">{{ $asetTerbaik ? number_format($asetTerbaik['preferensi'], 3) : '0.847' }}</div>
+                            <div class="bar-bg"><div class="bar-fill" data-w="{{ $asetTerbaik ? $asetTerbaik['preferensi'] * 100 : '84.7' }}"></div></div>
                         </div>
-                        <p class="small mb-4" style="color: var(--text-muted); line-height: 1.5;">Kriteria analisis yang aktif</p>
-                        <a href="{{ route('kriteria.index') }}" class="btn btn-sm btn-outline-info fw-semibold mt-auto" style="border-radius: 8px; font-size: 0.85rem;">Kelola</a>
-                    </div>
-                </div>
-
-                <!-- Total Aset Digital -->
-                <div class="col-md-6 col-lg-4">
-                    <div class="card modern-widget p-4 h-100">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div>
-                                <p class="mb-2 small fw-semibold" style="color: #00ff00; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.8rem;">Aset</p>
-                                <h3 class="fw-bold mb-0" style="font-size: 2.2rem; color: var(--text-main);">{{ $totalAsetDigital }}</h3>
-                            </div>
-                            <div class="widget-header-icon" style="background: rgba(0, 255, 0, 0.15); color: #00ff00; border: 1px solid rgba(0, 255, 0, 0.2); font-size: 1.5rem;">
-                                <i class="bi bi-box-seam"></i>
-                            </div>
+                        <div class="rank-row">
+                            <div class="rn">02</div>
+                            <div><div class="asset-name">Bayonet Marble Fade</div><div class="asset-game">Counter-Strike 2 · <span class="badge b-amber">Covert</span></div></div>
+                            <div class="score-num">0.791</div>
+                            <div class="bar-bg"><div class="bar-fill" data-w="79.1"></div></div>
                         </div>
-                        <p class="small mb-4" style="color: var(--text-muted); line-height: 1.5;">Aset digital dianalisis</p>
-                        <a href="{{ route('aset-digital.index') }}" class="btn btn-sm btn-outline-success fw-semibold mt-auto" style="border-radius: 8px; font-size: 0.85rem;">Kelola</a>
-                    </div>
-                </div>
-
-                <!-- Total Penilaian -->
-                <div class="col-md-6 col-lg-4">
-                    <div class="card modern-widget p-4 h-100">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div>
-                                <p class="mb-2 small fw-semibold" style="color: #ffc107; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.8rem;">Penilaian</p>
-                                <h3 class="fw-bold mb-0" style="font-size: 2.2rem; color: var(--text-main);">{{ $totalPenilaian }}</h3>
-                            </div>
-                            <div class="widget-header-icon icon-gold" style="font-size: 1.5rem;">
-                                <i class="bi bi-pencil-square"></i>
-                            </div>
+                        <div class="rank-row">
+                            <div class="rn">03</div>
+                            <div><div class="asset-name">Arcana Phantom Assn.</div><div class="asset-game">Dota 2 · <span class="badge b-purple">Arcana</span></div></div>
+                            <div class="score-num">0.724</div>
+                            <div class="bar-bg"><div class="bar-fill" data-w="72.4"></div></div>
                         </div>
-                        @php
-                            $maxPenilaian = $totalKriteria * $totalAsetDigital;
-                            $persentase = $maxPenilaian > 0 ? round(($totalPenilaian / $maxPenilaian) * 100, 0) : 0;
-                        @endphp
-                        <div class="progress mb-2" style="height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden;">
-                            <div class="progress-bar" style="background: linear-gradient(90deg, #ffc107, #ff9800); width: {{ $persentase }}%;"></div>
+                        <div class="rank-row">
+                            <div class="rn">04</div>
+                            <div><div class="asset-name">Immortal Wraith King</div><div class="asset-game">Dota 2 · <span class="badge b-teal">Immortal</span></div></div>
+                            <div class="score-num">0.663</div>
+                            <div class="bar-bg"><div class="bar-fill am" data-w="66.3"></div></div>
                         </div>
-                        <small class="fw-semibold" style="color: #ffc107;">{{ $persentase }}% Lengkap</small>
-                    </div>
-                </div>
-            </div>
-                <div class="col-lg-4 animate-entrance" style="animation-delay: 0.2s;">
-                    <div class="card h-100 modern-widget p-4">
-                        <div class="d-flex align-items-center justify-content-between mb-4">
-                            <h5 class="fw-bold mb-0">Aset Peringkat #1</h5>
-                            <div class="widget-header-icon icon-gold"><i class="bi bi-trophy-fill"></i></div>
-                        </div>
-                        <div class="text-center mt-2 mb-4">
-                            @if($asetTerbaik)
-                                <span class="badge bg-warning bg-opacity-25 text-warning rounded-pill px-3 py-1 mb-2 border border-warning border-opacity-50">Sangat Direkomendasikan</span>
-                                <h3 class="fw-bold mt-2 mb-1" style="color: var(--text-main);">{{ $asetTerbaik['nama_aset'] }}</h3>
-                                <p class="small mb-3" style="color: var(--text-muted);">{{ $asetTerbaik['jenis_aset'] }}</p>
-                                <p class="small mb-3" style="color: var(--text-muted);">Nilai Preferensi TOPSIS:</p>
-                                <div class="score-display">{{ number_format($asetTerbaik['preferensi'], 4) }}</div>
-                            @else
-                                <span class="badge bg-secondary bg-opacity-25 text-secondary rounded-pill px-3 py-1 mb-2 border border-secondary border-opacity-50">Belum Ada Data</span>
-                                <h3 class="fw-bold mt-2 mb-1" style="color: var(--text-muted);">-</h3>
-                                <p class="small mb-3" style="color: var(--text-muted);">Tambahkan kriteria dan aset untuk mulai analisis</p>
-                                <div class="score-display">-</div>
-                            @endif
-                        </div>
-                        <div class="mt-auto pt-3 border-top" style="border-color: var(--card-border) !important;">
-                            <a href="{{ route('topsis.hasil') }}" class="btn btn-outline-warning btn-interactive w-100">Lihat Detail Analisis</a>
+                        <div class="rank-row">
+                            <div class="rn">05</div>
+                            <div><div class="asset-name">M4A4 Howl</div><div class="asset-game">Counter-Strike 2 · <span class="badge b-red">Contraband</span></div></div>
+                            <div class="score-num">0.612</div>
+                            <div class="bar-bg"><div class="bar-fill am" data-w="61.2"></div></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-4 animate-entrance" style="animation-delay: 0.4s;">
-                    <div class="card h-100 modern-widget p-4">
-                        <div class="d-flex align-items-center justify-content-between mb-4">
-                            <h5 class="fw-bold mb-0">Aktivitas Sistem</h5>
-                            <div class="widget-header-icon icon-cyan"><i class="bi bi-clock-history"></i></div>
+                <div class="side-panel">
+                    <div class="card">
+                        <div class="card-head">
+                            <div class="card-title">Bobot Kriteria</div>
+                            <a href="{{ route('kriteria.index') }}" class="icon-btn" style="width:22px; height:22px; border:none; color:var(--color-text-secondary);"><i class="ti ti-edit" style="font-size:12px;" aria-hidden="true"></i></a>
                         </div>
-                        <ul class="activity-list flex-grow-1">
-                            <li class="activity-item"><div class="activity-dot bg-success shadow-sm"></div><div><span style="color: var(--text-main); font-weight: 600;">Data Aset ditambahkan</span><br><span class="small opacity-75" style="color: var(--text-muted);">Hari ini, 10:45 WIB</span></div></li>
-                            <li class="activity-item"><div class="activity-dot bg-info shadow-sm"></div><div><span style="color: var(--text-main); font-weight: 600;">Kalkulasi TOPSIS selesai</span><br><span class="small opacity-75" style="color: var(--text-muted);">Hari ini, 09:30 WIB</span></div></li>
-                            <li class="activity-item"><div class="activity-dot bg-warning shadow-sm"></div><div><span style="color: var(--text-main); font-weight: 600;">Bobot kriteria diubah</span><br><span class="small opacity-75" style="color: var(--text-muted);">Kemarin, 14:15 WIB</span></div></li>
-                        </ul>
+                        <div style="padding:8px 14px;">
+                            <div class="crit-row">
+                                <div class="crit-icon" style="background:rgba(239,68,68,0.1);"><i class="ti ti-coin" style="font-size:13px;color:#ef4444;" aria-hidden="true"></i></div>
+                                <div class="crit-name">Harga Beli</div>
+                                <span class="crit-type b-red badge">Cost</span>
+                                <div class="crit-w">20%</div>
+                            </div>
+                            <div class="crit-row">
+                                <div class="crit-icon" style="background:rgba(0, 212, 255, 0.1);"><i class="ti ti-activity" style="font-size:13px;color:var(--accent-cyan);" aria-hidden="true"></i></div>
+                                <div class="crit-name">Volume Transaksi</div>
+                                <span class="crit-type b-teal badge">Benefit</span>
+                                <div class="crit-w">25%</div>
+                            </div>
+                            <div class="crit-row">
+                                <div class="crit-icon" style="background:rgba(99,102,241,0.1);"><i class="ti ti-diamond" style="font-size:13px;color:#6366f1;" aria-hidden="true"></i></div>
+                                <div class="crit-name">Tingkat Rarity</div>
+                                <span class="crit-type b-purple badge">Benefit</span>
+                                <div class="crit-w">25%</div>
+                            </div>
+                            <div class="crit-row">
+                                <div class="crit-icon" style="background:rgba(245,158,11,0.1);"><i class="ti ti-trending-up" style="font-size:13px;color:#f59e0b;" aria-hidden="true"></i></div>
+                                <div class="crit-name">Market Sentiment</div>
+                                <span class="crit-type b-teal badge">Benefit</span>
+                                <div class="crit-w">15%</div>
+                            </div>
+                            <div class="crit-row">
+                                <div class="crit-icon" style="background:rgba(0, 212, 255, 0.1);"><i class="ti ti-droplet" style="font-size:13px;color:var(--accent-cyan);" aria-hidden="true"></i></div>
+                                <div class="crit-name">Likuiditas</div>
+                                <span class="crit-type b-teal badge">Benefit</span>
+                                <div class="crit-w">15%</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="col-lg-4 animate-entrance" style="animation-delay: 0.6s;">
-                    <div class="card h-100 modern-widget p-4">
-                        <div class="d-flex align-items-center justify-content-between mb-4">
-                            <h5 class="fw-bold mb-0">Ekspor Laporan</h5>
-                            <div class="widget-header-icon icon-blue"><i class="bi bi-cloud-arrow-down-fill"></i></div>
-                        </div>
-                        <p class="small mb-4" style="color: var(--text-muted); line-height: 1.6;">Unduh matriks keputusan, hasil ideal positif/negatif, dan peringkat akhir.</p>
-                        <div class="d-flex flex-column gap-3 mt-auto">
-                            <button class="btn btn-danger btn-interactive d-flex align-items-center justify-content-center text-white" style="background: linear-gradient(90deg, #dc3545, #f06573); border: none;"><i class="bi bi-file-earmark-pdf-fill fs-5 me-2"></i> Laporan PDF</button>
-                            <button class="btn btn-success btn-interactive d-flex align-items-center justify-content-center text-white" style="background: linear-gradient(90deg, #198754, #28a745); border: none;"><i class="bi bi-file-earmark-spreadsheet-fill fs-5 me-2"></i> Ekspor Excel</button>
+                    <div class="card">
+                        <div class="card-head"><div class="card-title">Notifikasi Pasar</div><span class="badge b-red">3 baru</span></div>
+                        <div style="padding:8px 14px;">
+                            <div class="alert-row">
+                                <div class="alert-dot" style="background:var(--accent-cyan);"></div>
+                                <div><div class="alert-text">Dragon Lore naik 8.3% dalam 2 jam terakhir</div><div class="alert-time">14 menit lalu</div></div>
+                            </div>
+                            <div class="alert-row">
+                                <div class="alert-dot" style="background:#f59e0b;"></div>
+                                <div><div class="alert-text">Volume M4A4 Howl menurun 15% hari ini</div><div class="alert-time">1 jam lalu</div></div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="row mb-5 animate-entrance" style="animation-delay: 0.8s;">
-                <div class="col-12">
-                    <div class="card modern-widget p-4">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="fw-bold mb-0">Perbandingan Skor TOPSIS</h5>
+            <div class="bottom-grid">
+                <div class="card">
+                    <div class="card-head"><div class="card-title">Distribusi Volume per Platform</div><span class="badge b-teal">7 hari</span></div>
+                    <div class="mini-chart">
+                        <div class="chart-bars">
+                            <div class="cbar" style="height:80%; background:var(--accent-cyan);"></div>
+                            <div class="cbar" style="height:55%; background:var(--accent-cyan); opacity:.7;"></div>
+                            <div class="cbar" style="height:65%; background:var(--accent-cyan); opacity:.6;"></div>
+                            <div class="cbar" style="height:42%; background:#f59e0b;"></div>
+                            <div class="cbar" style="height:30%; background:#f59e0b; opacity:.7;"></div>
+                            <div class="cbar" style="height:20%; background:#6366f1;"></div>
+                            <div class="cbar" style="height:15%; background:#6366f1; opacity:.7;"></div>
                         </div>
-                        <div id="topsisChart" style="min-height: 300px;"></div>
+                        <div class="chart-labels">
+                            <div class="clabel">Steam</div>
+                            <div class="clabel">CS2</div>
+                            <div class="clabel">DMarket</div>
+                            <div class="clabel">Dota2</div>
+                            <div class="clabel">Skinport</div>
+                            <div class="clabel">OpenSea</div>
+                            <div class="clabel">Rarible</div>
+                        </div>
+                        <div style="display:flex; gap:12px; margin-top:14px; font-family: var(--font-sans);">
+                            <div style="display:flex; align-items:center; gap:4px; font-size:10px; color:var(--color-text-secondary);"><div style="width:8px; height:8px; border-radius:2px; background:var(--accent-cyan);"></div>Counter-Strike</div>
+                            <div style="display:flex; align-items:center; gap:4px; font-size:10px; color:var(--color-text-secondary);"><div style="width:8px; height:8px; border-radius:2px; background:#f59e0b;"></div>Dota 2</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-head"><div class="card-title">Distribusi Rarity Aset</div><span class="badge b-purple">{{ $totalAsetDigital }} aset</span></div>
+                    <div style="display:flex; align-items:center; padding:10px 18px 14px;">
+                        <div class="progress-ring">
+                            <div class="ring-wrap">
+                                <svg viewBox="0 0 90 90">
+                                    <circle cx="45" cy="45" r="35" fill="none" stroke-width="10" stroke="var(--color-background-primary)"/>
+                                    <circle cx="45" cy="45" r="35" fill="none" stroke-width="10" stroke="var(--accent-cyan)" stroke-dasharray="66 154" stroke-dashoffset="0" stroke-linecap="round"/>
+                                    <circle cx="45" cy="45" r="35" fill="none" stroke-width="10" stroke="#f59e0b" stroke-dasharray="44 176" stroke-dashoffset="-66" stroke-linecap="round"/>
+                                    <circle cx="45" cy="45" r="35" fill="none" stroke-width="10" stroke="#6366f1" stroke-dasharray="33 187" stroke-dashoffset="-110" stroke-linecap="round"/>
+                                    <circle cx="45" cy="45" r="35" fill="none" stroke-width="10" stroke="#ef4444" stroke-dasharray="17 203" stroke-dashoffset="-143" stroke-linecap="round"/>
+                                </svg>
+                                <div class="ring-center">
+                                    <div class="ring-val">{{ $totalAsetDigital }}</div>
+                                    <div class="ring-label">total</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ring-info">
+                            <div class="ri-row"><span style="display:flex; align-items:center; color:var(--color-text-primary);"><div class="ri-dot" style="background:var(--accent-cyan);"></div>Covert</span><span>42%</span></div>
+                            <div class="ri-row"><span style="display:flex; align-items:center; color:var(--color-text-primary);"><div class="ri-dot" style="background:#f59e0b;"></div>Immortal</span><span>29%</span></div>
+                            <div class="ri-row"><span style="display:flex; align-items:center; color:var(--color-text-primary);"><div class="ri-dot" style="background:#6366f1;"></div>Arcana</span><span>21%</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -309,84 +465,46 @@
         </div>
     </div>
 </div>
-
-<button class="fab-btn animate-entrance" style="animation-delay: 1s;" data-bs-toggle="modal" data-bs-target="#quickModal" title="Tindakan Cepat">
-    <i class="bi bi-plus-lg fs-3"></i>
-</button>
-
-<div class="modal fade" id="quickModal" tabindex="-1" aria-labelledby="quickModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content modal-content-custom">
-            <div class="modal-header modal-header-custom border-bottom-0 pb-0">
-                <h5 class="modal-title fw-bold" id="quickModalLabel">Tindakan Cepat</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-4 text-center">
-                <p class="text-muted mb-4">Pilih tindakan yang ingin Anda lakukan secara instan:</p>
-                <div class="row g-3">
-                    <div class="col-6">
-                        <a href="/kriteria" class="btn btn-outline-info w-100 py-3 rounded-4 fw-bold d-flex flex-column align-items-center gap-2">
-                            <i class="bi bi-ui-checks-grid fs-2"></i> Tambah Kriteria
-                        </a>
-                    </div>
-                    <div class="col-6">
-                        <a href="#" class="btn btn-outline-warning w-100 py-3 rounded-4 fw-bold d-flex flex-column align-items-center gap-2">
-                            <i class="bi bi-box-seam-fill fs-2"></i> Tambah Aset
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        
-        // --- KONFIGURASI GRAFIK APEXCHARTS ---
-        var chartOptions = {
-            series: [{ name: 'Skor Preferensi', data: [0.985, 0.872, 0.765, 0.650, 0.540] }],
-            chart: { type: 'bar', height: 320, toolbar: { show: false }, background: 'transparent', fontFamily: 'Plus Jakarta Sans, sans-serif' },
-            plotOptions: { bar: { borderRadius: 8, horizontal: false, columnWidth: '45%', distributed: true } },
-            colors: ['#ffc107', '#00d4ff', '#4dabf7', '#a78bfa', '#f472b6'], 
-            dataLabels: { enabled: true, style: { fontSize: '12px', colors: ["#fff"] } },
-            xaxis: { categories: ['Ethereum', 'Bitcoin', 'Dragon Lore', 'CS:GO Case', 'Axie'], labels: { style: { colors: '#94a3b8', fontSize: '13px', fontWeight: 600 } }, axisBorder: { show: false }, axisTicks: { show: false } },
-            yaxis: { labels: { style: { colors: '#94a3b8', fontWeight: 500 } } },
-            grid: { borderColor: 'rgba(255, 255, 255, 0.05)', strokeDashArray: 4, yaxis: { lines: { show: true } } },
-            theme: { mode: 'dark' }, legend: { show: false }, tooltip: { theme: 'dark' }
-        };
-        var chart = new ApexCharts(document.querySelector("#topsisChart"), chartOptions);
-        chart.render();
+        // ANIMASI LOADING TRACER PROGRESS BAR RANKING
+        setTimeout(() => {
+            document.querySelectorAll('.bar-fill').forEach(b => {
+                b.style.width = (b.dataset.w || 0) + '%';
+            });
+        }, 300);
 
-        // --- LOGIKA DARK/LIGHT MODE ---
         const themeToggleBtn = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
-        const themeText = document.getElementById('themeText');
         const htmlElement = document.documentElement;
+        const bodyElement = document.body;
 
         const currentTheme = localStorage.getItem('theme') || 'dark';
-        htmlElement.setAttribute('data-theme', currentTheme);
-        updateUI(currentTheme);
+        applyTheme(currentTheme);
 
         themeToggleBtn.addEventListener('click', () => {
-            let newTheme = htmlElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            htmlElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateUI(newTheme);
+            const activeTheme = htmlElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', activeTheme);
+            applyTheme(activeTheme);
         });
 
-        function updateUI(theme) {
-            if (theme === 'light') { themeIcon.className = 'bi bi-moon-fill text-primary me-2'; themeText.innerText = 'Mode Gelap'; } 
-            else { themeIcon.className = 'bi bi-sun-fill text-warning me-2'; themeText.innerText = 'Mode Terang'; }
-            
-            chart.updateOptions({
-                theme: { mode: theme },
-                grid: { borderColor: theme === 'light' ? 'rgba(0,0,0,0.05)' : 'rgba(255,255,255,0.05)' },
-                xaxis: { labels: { style: { colors: theme === 'light' ? '#64748b' : '#94a3b8' } } },
-                yaxis: { labels: { style: { colors: theme === 'light' ? '#64748b' : '#94a3b8' } } }
-            });
+        function applyTheme(theme) {
+            htmlElement.setAttribute('data-theme', theme);
+
+            if (theme === 'light') {
+                htmlElement.classList.remove('dark');
+                htmlElement.classList.add('light');
+                bodyElement.classList.remove('dark');
+                bodyElement.classList.add('light');
+                themeIcon.className = 'ti ti-moon text-primary';
+            } else {
+                htmlElement.classList.remove('light');
+                htmlElement.classList.add('dark');
+                bodyElement.classList.remove('light');
+                bodyElement.classList.add('dark');
+                themeIcon.className = 'ti ti-sun text-warning';
+            }
         }
     });
 </script>

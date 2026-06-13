@@ -6,7 +6,7 @@ use App\Models\Kriteria;
 use App\Models\AsetDigital;
 use App\Models\Penilaian;
 use App\Services\TopsisService;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 class DashboardController extends Controller
 {
     protected $topsisService;
@@ -14,6 +14,33 @@ class DashboardController extends Controller
     public function __construct(TopsisService $topsisService)
     {
         $this->topsisService = $topsisService;
+    }
+    public function exportPdf()
+    {
+        $totalKriteria = Kriteria::count();
+        $totalAsetDigital = AsetDigital::count();
+        $totalPenilaian = Penilaian::count();
+
+        // Mengambil hasil komputasi TOPSIS lengkap dari Service
+        $topsisResult = $this->topsisService->hitungTopsis();
+        
+        $daftarRanking = !empty($topsisResult) && isset($topsisResult['hasil_akhir']) 
+            ? $topsisResult['hasil_akhir'] 
+            : [];
+            
+        $asetTerbaik = !empty($daftarRanking) ? $daftarRanking[0] : null;
+
+        // Load halaman khusus cetak PDF dengan data dinamis
+        $pdf = Pdf::loadView('topsis.laporan_pdf', compact(
+            'totalKriteria',
+            'totalAsetDigital',
+            'totalPenilaian',
+            'asetTerbaik',
+            'daftarRanking'
+        ));
+
+        // Mengunduh berkas langsung ke komputer pengguna
+        return $pdf->download('Laporan-Analisis-TOPSIS-InvestGame.pdf');
     }
 
     public function index()

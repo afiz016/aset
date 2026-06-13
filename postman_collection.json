@@ -1,0 +1,134 @@
+{
+  "info": {
+    "name": "SPK Aset Digital - API Collection",
+    "description": "Collection untuk testing API pengambilan data aset digital",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "OpenSea - Fetch Single Collection",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/fetch-opensea/boredapeyachtclub",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["fetch-opensea", "boredapeyachtclub"]
+        },
+        "description": "Fetch NFT data dari OpenSea untuk koleksi Bored Ape Yacht Club"
+      },
+      "response": []
+    },
+    {
+      "name": "OpenSea - Fetch CryptoPunks",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/fetch-opensea/cryptopunks",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["fetch-opensea", "cryptopunks"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Steam Market - AK-47 Dragon Lore",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/fetch-steam/730/AK-47%20%7C%20Dragon%20Lore",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["fetch-steam", "730", "AK-47 | Dragon Lore"]
+        },
+        "description": "Fetch CS:GO item dari Steam Market. App ID 730 = CS:GO"
+      },
+      "response": []
+    },
+    {
+      "name": "Steam Market - M4A4 Howl",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/fetch-steam/730/M4A4%20%7C%20Howl",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["fetch-steam", "730", "M4A4 | Howl"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Blur - Fetch NFT",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/fetch-blur/0xbc4ca0eda7647a8ab7c2061c2e2ad3e12e7eb9e1/123",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["fetch-blur", "0xbc4ca0eda7647a8ab7c2061c2e2ad3e12e7eb9e1", "123"]
+        },
+        "description": "Fetch NFT dari Blur marketplace (Ethereum contract address)"
+      },
+      "response": []
+    },
+    {
+      "name": "Magic Eden - Solana NFT",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8000/fetch-magiceden/So1ipWXNUWYP8pNQrQixCoWVj2p6Z7Lne8fF69YYhYs",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["fetch-magiceden", "So1ipWXNUWYP8pNQrQixCoWVj2p6Z7Lne8fF69YYhYs"]
+        },
+        "description": "Fetch NFT dari Magic Eden (Solana blockchain)"
+      },
+      "response": []
+    },
+    {
+      "name": "Batch Fetch - Multiple Items",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"platforms\": [\n    {\n      \"platform\": \"opensea\",\n      \"params\": {\"slug\": \"boredapeyachtclub\"}\n    },\n    {\n      \"platform\": \"opensea\",\n      \"params\": {\"slug\": \"cryptopunks\"}\n    },\n    {\n      \"platform\": \"steam\",\n      \"params\": {\"app_id\": \"730\", \"item_name\": \"AK-47 | Dragon Lore\"}\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/fetch-batch",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8000",
+          "path": ["fetch-batch"]
+        },
+        "description": "Fetch data dari multiple platforms sekaligus"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000"
+    }
+  ]
+}

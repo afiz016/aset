@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'opensea' => [
+    'key' => env('OPENSEA_API_KEY'),
+    'base_url' => env('OPENSEA_BASE_URL'),
+    ],
+
 ];

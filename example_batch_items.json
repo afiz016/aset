@@ -1,0 +1,49 @@
+{
+  "platforms": [
+    {
+      "platform": "opensea",
+      "params": {
+        "slug": "boredapeyachtclub"
+      }
+    },
+    {
+      "platform": "opensea",
+      "params": {
+        "slug": "cryptopunks"
+      }
+    },
+    {
+      "platform": "opensea",
+      "params": {
+        "slug": "pudgypenguins"
+      }
+    },
+    {
+      "platform": "steam",
+      "params": {
+        "app_id": 730,
+        "item_name": "AK-47 | Dragon Lore"
+      }
+    },
+    {
+      "platform": "steam",
+      "params": {
+        "app_id": 730,
+        "item_name": "M4A4 | Howl"
+      }
+    },
+    {
+      "platform": "blur",
+      "params": {
+        "contract_address": "0xbc4ca0eda7647a8ab7c2061c2e2ad3e12e7eb9e1",
+        "token_id": "123"
+      }
+    },
+    {
+      "platform": "magiceden",
+      "params": {
+        "mint": "So1ipWXNUWYP8pNQrQixCoWVj2p6Z7Lne8fF69YYhYs"
+      }
+    }
+  ]
+}
