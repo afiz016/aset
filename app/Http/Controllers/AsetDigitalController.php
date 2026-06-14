@@ -6,7 +6,7 @@ use App\Models\AsetDigital;
 use App\Models\Kriteria;
 use App\Models\Penilaian;
 use Illuminate\Http\Request;
-
+use App\Services\MarketplaceApiService;
 class AsetDigitalController extends Controller
 {
     public function index()
@@ -90,5 +90,37 @@ class AsetDigitalController extends Controller
     {
         AsetDigital::findOrFail($id)->delete();
         return redirect()->route('aset-digital.index')->with('success', 'Aset digital berhasil dihapus.');
+    }
+
+    public function syncData()
+    {
+    $asets = AsetDigital::all();
+    $successCount = 0;
+
+    foreach ($asets as $aset) {
+        $data = null;
+        $platform = strtolower($aset->jenis_aset);
+
+        // Deteksi jenis aset berdasarkan platform
+        if ($platform === 'opensea') {
+            $data = MarketplaceApiService::fetchOpenSeaData($aset->nama_aset);
+        } elseif ($platform === 'steam market' || $platform === 'steam') {
+            // Kita asumsikan App ID disimpan atau default CS2 (730) untuk kebutuhan instan
+            $data = MarketplaceApiService::fetchSteamMarketData('730', $aset->nama_aset);
+        }
+
+        // Jika data berhasil ditarik, lakukan pembaharuan matriks kriteria
+        if ($data && !isset($data['error'])) {
+            $result = MarketplaceApiService::saveAsetFromAPI($data);
+            if ($result['success']) {
+                $successCount++;
+            }
+        }
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => $successCount . ' aset digital berhasil diperbarui dengan data pasar terbaru!'
+    ]);
     }
 }

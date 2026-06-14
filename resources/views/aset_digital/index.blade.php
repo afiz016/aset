@@ -8,7 +8,12 @@
         <div class="card-header p-4 fw-bold" style="background: linear-gradient(90deg, rgba(0, 212, 255, 0.15), rgba(0, 100, 150, 0.08)); border: none; border-bottom: 2px solid rgba(0, 212, 255, 0.3);">
             <div class="d-flex justify-content-between align-items-center">
                 <h3 class="mb-0 text-info"><i class="bi bi-box-seam-fill me-2"></i>Daftar Alternatif Aset Digital</h3>
-                <a href="{{ route('aset-digital.create') }}" class="btn fw-bold" style="background: linear-gradient(90deg, #00d4ff, #4dabf7); color: #000; padding: 0.6rem 1.5rem; border: none; border-radius: 8px;"><i class="bi bi-plus-lg me-1"></i> Tambah Aset</a>
+                <div class="d-flex gap-2">
+                    <button id="btnSyncApi" class="btn btn-outline-info fw-bold" style="padding: 0.6rem 1.5rem; border-radius: 8px; transition: all 0.3s;">
+                        <i class="bi bi-arrow-clockwise me-1" id="iconSync"></i> Sync Data API
+                    </button>
+                    <a href="{{ route('aset-digital.create') }}" class="btn fw-bold" style="background: linear-gradient(90deg, #00d4ff, #4dabf7); color: #000; padding: 0.6rem 1.5rem; border: none; border-radius: 8px;"><i class="bi bi-plus-lg me-1"></i> Tambah Aset</a>
+                </div>
             </div>
         </div>
         
@@ -78,4 +83,32 @@
         </div>
     </div>
 </div>
+
+<script>
+document.getElementById('btnSyncApi').addEventListener('click', function() {
+    const btn = this;
+    
+    // 1. Ubah visual tombol menjadi efek loading
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Menghubungkan API...`;
+    
+    // 2. Eksekusi request ke route sync
+    fetch("{{ route('aset-digital.sync') }}")
+        .then(response => response.json())
+        .then(data => {
+            if(data.success) {
+                alert('✓ Sukses: ' + data.message);
+                window.location.reload();
+            } else {
+                alert('❌ Gagal menyinkronkan data.');
+                window.location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('❌ Terjadi kesalahan jaringan saat fetch data.');
+            window.location.reload();
+        });
+});
+</script>
 @endsection

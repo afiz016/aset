@@ -68,4 +68,24 @@ class KriteriaController extends Controller
 
         return redirect()->route('kriteria.index')->with('success', 'Kriteria berhasil dihapus!');
     }
+    /**
+ * Memperbarui bobot seluruh kriteria secara massal (batch)
+ */
+    public function updateBatch(Request $request)
+    {
+    $request->validate([
+        'bobot' => 'required|array',
+        'bobot.*' => 'required|numeric|min:0|max:100',
+    ]);
+
+    // Lakukan perulangan untuk menyimpan masing-masing bobot kriteria
+    foreach ($request->bobot as $id => $nilaiBobot) {
+        $kriteria = Kriteria::find($id);
+        if ($kriteria) {
+            $kriteria->update(['bobot' => $nilaiBobot]);
+        }
+    }
+
+    return redirect()->route('kriteria.index')->with('success', 'Bobot seluruh kriteria berhasil diperbarui!');
+    }
 }

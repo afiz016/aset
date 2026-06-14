@@ -188,27 +188,29 @@ class MarketplaceApiService
 
             // Jika auto mapping kriteria aktif, simpan nilai ke Penilaian
             if ($autoMapKriteria) {
-                $kriteriaMaps = [
-                    'Harga Beli Saat Ini' => $apiData['harga_beli'],
-                    'Volume Transaksi 24 Jam' => $apiData['volume_24h'],
-                    'Tingkat Kelangkaan / Rarity' => $apiData['rarity'],
-                    'Market Sentiment / Tren Komunitas' => $apiData['sentiment'],
-                    'Tingkat Likuiditas' => $apiData['liquidity']
-                ];
+            // Kita ubah mapping-nya menggunakan KODE KRITERIA sebagai key
+            $kriteriaMaps = [
+                'C1' => $apiData['harga_beli'],
+                'C2' => $apiData['volume_24h'],
+                'C3' => $apiData['rarity'],
+                'C4' => $apiData['sentiment'],
+                'C5' => $apiData['liquidity']
+            ];
 
-                foreach ($kriteriaMaps as $criteriaName => $value) {
-                    $criteria = Kriteria::where('nama_kriteria', $criteriaName)->first();
+            foreach ($kriteriaMaps as $kodeKriteria => $value) {
+                // Mengubah pencarian berdasarkan kolom 'kode_kriteria' (bukan lagi nama_kriteria)
+                $criteria = Kriteria::where('kode_kriteria', $kodeKriteria)->first();
 
-                    if ($criteria) {
-                        Penilaian::updateOrCreate(
-                            [
-                                'aset_digital_id' => $aset->id,
-                                'kriteria_id' => $criteria->id
-                            ],
-                            ['nilai' => $value]
-                        );
-                    }
+                if ($criteria) {
+                    Penilaian::updateOrCreate(
+                        [
+                            'aset_digital_id' => $aset->id,
+                            'kriteria_id' => $criteria->id
+                        ],
+                        ['nilai' => $value]
+                    );
                 }
+            }
             }
 
             return [
