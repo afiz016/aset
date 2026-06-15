@@ -4,10 +4,14 @@
 
 @section('content')
 
+<!-- Ambil font dan ikon yang dibutuhkan untuk area konten -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
     
+    /* ====================================================
+       PENGATURAN VARIABEL WARNA (SYNCED WITH DASHBOARD)
+       ==================================================== */
     :root {
         --color-background-primary: #0a0f1d;
         --color-background-secondary: #0f172a;
@@ -18,14 +22,26 @@
         --accent-cyan: #00d4ff;
     }
 
+    [data-theme="light"], .light {
+        --color-background-primary: #f1f5f9;
+        --color-background-secondary: #ffffff;
+        --color-text-primary: #0f172a;
+        --color-text-secondary: #64748b;
+        --color-border-secondary: rgba(15, 23, 42, 0.14);
+        --color-border-tertiary: rgba(15, 23, 42, 0.05);
+        --accent-cyan: #0284c7;
+    }
+
     .D-container {
         font-family: 'Space Grotesk', sans-serif;
         background: var(--color-background-primary);
+        color: var(--color-text-primary);
         padding: 28px;
         display: flex;
         flex-direction: column;
         gap: 26px;
         min-height: 100vh;
+        transition: background 0.3s, color 0.3s;
     }
 
     .glass-card-premium {
@@ -33,21 +49,39 @@
         border: 0.5px solid var(--color-border-tertiary);
         border-radius: 16px;
         padding: 24px;
-        transition: border-color 0.3s;
+        transition: all 0.3s;
     }
     .glass-card-premium:hover {
         border-color: rgba(0, 212, 255, 0.2);
     }
 
-    /* ====================================================
-       🔥 EFEK PREMIUM GLOW & ANIMASI TOMBOL TAMBAH KRITERIA
-       ==================================================== */
+    /* TOPBAR HEADER ACTIONS */
+    .icon-btn { 
+        width: 36px; 
+        height: 34px; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        border: 0.5px solid var(--color-border-secondary); 
+        border-radius: 12px; 
+        cursor: pointer; 
+        color: var(--color-text-secondary); 
+        background: transparent; 
+        transition: all 0.2s; 
+    }
+    .icon-btn:hover { 
+        color: var(--accent-cyan); 
+        border-color: var(--accent-cyan); 
+        background: rgba(0, 212, 255, 0.05); 
+    }
+
+    /* PREMIUM SOLID NEON ADD BUTTON EFFECT */
     .btn-add-premium {
-        background: transparent;
-        color: var(--accent-cyan) !important;
-        border: 1px solid var(--color-border-secondary) !important;
+        background: linear-gradient(90deg, var(--accent-cyan) 0%, #4dabf7 100%);
+        color: #0a0f1d !important;
+        border: none !important;
         border-radius: 12px;
-        padding: 10px 22px;
+        padding: 11px 24px;
         font-weight: 700;
         font-size: 13px;
         display: inline-flex;
@@ -55,25 +89,22 @@
         gap: 8px;
         text-decoration: none;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 0 0 rgba(0, 212, 255, 0);
+        box-shadow: 0 4px 14px rgba(0, 212, 255, 0.25);
     }
     .btn-add-premium:hover {
-        background: rgba(0, 212, 255, 0.08) !important;
-        border-color: var(--accent-cyan) !important;
-        color: #ffffff !important;
-        transform: translateY(-2px) scale(1.02);
-        box-shadow: 0 0 20px rgba(0, 212, 255, 0.35);
+        background: linear-gradient(90deg, #00bfe6 0%, #339af0 100%);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 212, 255, 0.5);
     }
-    /* Mikro-interaksi untuk ikon tambah (+) agar berputar saat di-hover */
     .btn-add-premium i {
         display: inline-block;
         transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     .btn-add-premium:hover i {
-        transform: rotate(90deg) scale(1.2);
+        transform: rotate(90deg) scale(1.15);
     }
 
-    /* Custom range styling */
+    /* Custom range input styling */
     input[type="range"] {
         -webkit-appearance: none;
         appearance: none;
@@ -188,7 +219,6 @@
         cursor: not-allowed;
     }
 
-    /* Tombol Hapus Kecil */
     .btn-delete-crit {
         background: rgba(239, 68, 68, 0.1);
         color: #ef4444;
@@ -209,8 +239,18 @@
     }
 </style>
 
+<!-- 🛠️ UPGRADED HEADER: Search & Connect Wallet Dihilangkan Rapi -->
+<header class="w-full h-16 border-b d-flex justify-content-end align-items-center px-4 gap-3" style="background: var(--color-background-secondary); border-color: var(--color-border-tertiary) !important;">
+    <div class="d-flex align-items-center gap-3">
+        <!-- Hanya Menyisakan Tombol Utama Pengaturan Tema & Refresh Sistem -->
+        <div class="icon-btn" id="themeToggle" title="Ubah Tema"><i class="ti ti-sun" id="themeIcon" aria-hidden="true"></i></div>
+        <div class="icon-btn" onclick="window.location.reload();" title="Refresh Data"><i class="ti ti-refresh" aria-hidden="true"></i></div>
+    </div>
+</header>
+
 <div class="D-container">
     
+    <!-- Stepper Progress Segment -->
     <div class="stepper-wrap">
         <div class="stepper-line"></div>
         <div class="stepper-line-progress"></div>
@@ -229,9 +269,10 @@
         </div>
     </div>
 
+    <!-- Page Title Header & Tombol Tambah Kriteria Premium -->
     <div class="d-flex justify-content-between align-items-center mb-2">
         <div>
-            <h2 class="text-white fw-bold mb-1" style="font-size: 24px;">Langkah 1: Pembobotan Kriteria</h2>
+            <h2 class="fw-bold mb-1" style="color: var(--color-text-primary); font-size: 24px;">Langkah 1: Pembobotan Kriteria</h2>
             <p style="color: var(--color-text-secondary); font-size: 14px;" class="mb-0">Tentukan tingkat kepentingan relatif untuk setiap parameter investasi. Total bobot harus berjumlah 100%.</p>
         </div>
         
@@ -246,11 +287,13 @@
         </div>
     @endif
 
+    <!-- Form Submit Range Slider -->
     <form action="{{ route('kriteria.update-batch') }}" method="POST">
         @csrf
         @method('PUT')
 
         <div class="row g-4">
+            <!-- Left Side: Sliders Dinamis -->
             <div class="col-lg-8">
                 <div class="glass-card-premium d-flex flex-column gap-4">
                     
@@ -258,38 +301,37 @@
                     @forelse($kriterias as $k)
                         @php 
                             $totalBobotAwal += $k->bobot;
-                            
+                            $isCost = (strtolower($k->jenis) === 'cost');
+
                             $icon = 'ti-coin';
-                            $iconColor = '#ef4444';
-                            $badgeStyle = 'background: rgba(239, 68, 68, 0.1); color: #ef4444;';
-                            
                             if(stripos($k->nama_kriteria, 'volume') !== false || stripos($k->nama_kriteria, 'transaksi') !== false) {
                                 $icon = 'ti-activity';
-                                $iconColor = 'var(--accent-cyan)';
-                                $badgeStyle = 'background: rgba(0, 212, 255, 0.1); color: var(--accent-cyan);';
                             } elseif(stripos($k->nama_kriteria, 'langka') !== false || stripos($k->nama_kriteria, 'rarity') !== false) {
                                 $icon = 'ti-diamond';
-                                $iconColor = '#6366f1';
-                                $badgeStyle = 'background: rgba(99, 102, 241, 0.1); color: #6366f1;';
                             } elseif(stripos($k->nama_kriteria, 'sentiment') !== false || stripos($k->nama_kriteria, 'tren') !== false) {
                                 $icon = 'ti-trending-up';
-                                $iconColor = '#f59e0b';
-                                $badgeStyle = 'background: rgba(245, 158, 11, 0.1); color: #f59e0b;';
                             } elseif(stripos($k->nama_kriteria, 'likuid') !== false) {
                                 $icon = 'ti-droplet';
-                                $iconColor = 'var(--accent-cyan)';
-                                $badgeStyle = 'background: rgba(0, 212, 255, 0.1); color: var(--accent-cyan);';
+                            }
+
+                            if($isCost) {
+                                $iconColor = '#ef4444'; 
+                                $badgeStyle = 'background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.15);';
+                            } else {
+                                $iconColor = '#10b981'; 
+                                $badgeStyle = 'background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.15);';
                             }
                         @endphp
 
+                        <!-- Slider Element Row dengan Tombol Hapus -->
                         <div class="d-flex flex-column gap-2" id="row-{{ $k->id }}">
                             <div class="d-flex justify-content-between align-items-center">
-                                <label class="text-white fw-bold d-flex align-items-center gap-2" style="font-size: 14px;">
-                                    <div class="d-flex align-items-center justify-content-center rounded" style="width: 28px; height: 26px; background: rgba(255,255,255,0.02);">
+                                <label class="fw-bold d-flex align-items-center gap-2" style="color: var(--color-text-primary); font-size: 14px;">
+                                    <div class="d-flex align-items-center justify-content-center rounded" style="width: 28px; height: 26px; background: rgba(255,255,255,0.04);">
                                         <i class="ti {{ $icon }}" style="color: {{ $iconColor }}; font-size: 14px;"></i>
                                     </div>
                                     <span class="text-info font-mono me-1">[{{ $k->kode_kriteria }}]</span> {{ $k->nama_kriteria }} 
-                                    <span class="badge rounded-pill mx-1" style="{{ $badgeStyle }} font-size: 10px;">{{ ucfirst($k->jenis) }}</span>
+                                    <span class="badge rounded-pill mx-1" style="{{ $badgeStyle }} font-size: 10px;">{{ strtoupper($k->jenis) }}</span>
                                 </label>
                                 
                                 <div class="d-flex align-items-center gap-3">
@@ -310,7 +352,7 @@
                                    value="{{ $k->bobot }}">
                         </div>
                     @empty
-                        <div class="text-center text-muted py-4">
+                        <div class="text-center py-4" style="color: var(--color-text-secondary);">
                             <i class="ti ti-folder-off fs-3 mb-2"></i>
                             <p class="mb-0">Belum ada parameter kriteria. Silakan tambah kriteria baru.</p>
                         </div>
@@ -318,6 +360,7 @@
 
                 </div>
 
+                <!-- Accumulation Bar -->
                 <div class="mt-3 p-3 rounded-3 d-flex justify-content-between align-items-center border" style="background: var(--color-background-secondary); border-color: var(--color-border-tertiary) !important;">
                     <div class="d-flex align-items-center">
                         <span style="color: var(--color-text-secondary); font-size: 13px;">Total Akumulasi:</span>
@@ -329,26 +372,27 @@
                 </div>
             </div>
 
+            <!-- Right Side: Informational Card -->
             <div class="col-lg-4 d-flex flex-column gap-3">
                 <div class="glass-card-premium" style="border-left: 4px solid var(--accent-cyan);">
-                    <h5 class="text-white fw-bold mb-3 d-flex align-items-center gap-2" style="font-size: 15px;">
+                    <h5 class="fw-bold mb-3 d-flex align-items-center gap-2" style="color: var(--color-text-primary); font-size: 15px;">
                         <i class="ti ti-info-circle text-info"></i> Mengapa Ini Penting?
                     </h5>
-                    <p class="mb-3 text-white-50" style="font-size: 13px; line-height: 1.5;">
+                    <p class="mb-3" style="color: var(--color-text-secondary); font-size: 13px; line-height: 1.5;">
                         Metode <strong>TOPSIS</strong> menghitung jarak kedekatan relatif sebuah aset terhadap solusi ideal positif dan negatif.
                     </p>
-                    <div class="d-flex flex-column gap-2 text-white-50" style="font-size: 12px; line-height: 1.4;">
+                    <div class="d-flex flex-column gap-2" style="color: var(--color-text-secondary); font-size: 12px; line-height: 1.4;">
                         <div class="d-flex gap-2">
                             <span class="text-info fw-bold">1.</span>
                             <span>Bobot kriteria menentukan "derajat pengaruh" variabel terhadap skor akhir.</span>
                         </div>
                         <div class="d-flex gap-2">
-                            <span class="text-info fw-bold">2.</span>
-                            <span>Kriteria "Harga" bersifat cost (semakin kecil semakin baik).</span>
+                            <span class="text-danger fw-bold">2.</span>
+                            <span>Kriteria <strong class="text-danger">COST</strong> (seperti Harga Beli) semakin kecil nilainya akan dinilai semakin bagus.</span>
                         </div>
                         <div class="d-flex gap-2">
-                            <span class="text-info fw-bold">3.</span>
-                            <span>Yield & Rarity bersifat benefit (semakin besar semakin baik).</span>
+                            <span class="text-success fw-bold">3.</span>
+                            <span>Kriteria <strong class="text-success">BENEFIT</strong> (Rarity, Volume, Likuiditas) semakin besar nilainya akan dinilai semakin bagus.</span>
                         </div>
                     </div>
                 </div>
@@ -356,7 +400,7 @@
                 <button type="submit" id="submitBtn" class="btn-accent-premium">
                     Simpan & Lanjut ke Alternatif <i class="ti ti-arrow-right"></i>
                 </button>
-                <a href="/dashboard" class="btn text-center text-decoration-none py-2 text-white-50 border-0" style="font-size: 13px; font-weight: 500; background: rgba(255,255,255,0.02); border-radius: 10px;">
+                <a href="/dashboard" class="btn text-center text-decoration-none py-2 border-0" style="color: var(--color-text-secondary); font-size: 13px; font-weight: 500; background: rgba(255,255,255,0.02); border-radius: 10px;">
                     Simpan Draft
                 </a>
             </div>
@@ -370,6 +414,7 @@
 
 </div>
 
+<!-- Script Sinkronisasi Light/Dark Mode & Live Calculator Sliders -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const sliders = document.querySelectorAll('.slider-input');
@@ -405,6 +450,37 @@
         });
 
         updateTotal();
+
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const htmlElement = document.documentElement;
+        const bodyElement = document.body;
+
+        const currentTheme = localStorage.getItem('theme') || 'dark';
+        applyTheme(currentTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const activeTheme = htmlElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', activeTheme);
+            applyTheme(activeTheme);
+        });
+
+        function applyTheme(theme) {
+            htmlElement.setAttribute('data-theme', theme);
+            if (theme === 'light') {
+                htmlElement.classList.remove('dark');
+                htmlElement.classList.add('light');
+                bodyElement.classList.remove('dark');
+                bodyElement.classList.add('light');
+                themeIcon.className = 'ti ti-moon text-primary';
+            } else {
+                htmlElement.classList.remove('light');
+                htmlElement.classList.add('dark');
+                bodyElement.classList.remove('light');
+                bodyElement.classList.add('dark');
+                themeIcon.className = 'ti ti-sun text-warning';
+            }
+        }
     });
 
     function confirmDelete(id, name) {

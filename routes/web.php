@@ -9,54 +9,41 @@ use App\Http\Controllers\TopsisController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OpenSeaController;
 
+
 // Halaman Utama / Welcome
 Route::get('/', function () {
     return view('welcome');
 });
 
-// ==========================================
-// RUTE DI DALAM PROTEKSI AUTH (HARUS LOGIN)
-// ==========================================
+// ====================================================
+// 🔒 RUTE DI DALAM PROTEKSI AUTH (HARUS LOGIN SEBELUM AKSES)
+// ====================================================
 Route::middleware(['auth'])->group(function () {
     
-    // Rute Dashboard Utama & Export Laporan
+    // Rute Dashboard Utama & Export Laporan Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/export-pdf', [DashboardController::class, 'exportPdf'])->name('dashboard.exportPdf');
 
-    Route::middleware(['auth'])->group(function () {
-    
-    // Dashboard & Export
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard/export-pdf', [DashboardController::class, 'exportPdf'])->name('dashboard.exportPdf');
-
-    // 1. Route Manajemen Kriteria (TAMBAHKAN LINE DI BAWAH INI)
+    // 1. Route Manajemen Kriteria
     Route::put('/kriteria/update-batch', [KriteriaController::class, 'updateBatch'])->name('kriteria.update-batch');
     Route::resource('kriteria', KriteriaController::class);
 
-    // 2. Route Manajemen Aset Digital
-    Route::get('/aset-digital/sync', [AsetDigitalController::class, 'syncData'])->name('aset-digital.sync');
-    Route::resource('aset-digital', AsetDigitalController::class);
-
-    // 3. Route Perhitungan TOPSIS
-    Route::get('/topsis/hasil', [TopsisController::class, 'hitung'])->name('topsis.hasil');
-    });
-
-    // 1. Route Manajemen Kriteria
-    Route::resource('kriteria', KriteriaController::class);
-
     // 2. Route Manajemen Aset Digital (Alternatif & Penilaian)
-    // CATATAN: Rute aksi kustom kustom (sync) harus diletakkan DI ATAS Route::resource agar tidak dianggap sebagai ID aset
+    // CATATAN: Rute kustom (sync) wajib di atas resource agar tidak terbaca sebagai {id} alternatif
     Route::get('/aset-digital/sync', [AsetDigitalController::class, 'syncData'])->name('aset-digital.sync');
     Route::resource('aset-digital', AsetDigitalController::class);
 
     // 3. Route Perhitungan & Hasil Akhir TOPSIS
     Route::get('/topsis/hasil', [TopsisController::class, 'hitung'])->name('topsis.hasil');
+    
+    // 🚀 TOMBOL CETAK PDF BARU (LANGSUNG DOWNLOAD SINKRON DENGAN SERVICE)
+    Route::get('/topsis/cetak-pdf', [TopsisController::class, 'cetakPdf'])->name('topsis.cetak');
 
 });
 
-// ==========================================
-// RUTE AUTENTIKASI (LOGIN, REGISTER, PASSWORD)
-// ==========================================
+// ====================================================
+// 🔑 RUTE AUTENTIKASI (LOGIN, REGISTER, PASSWORD)
+// ====================================================
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -71,9 +58,9 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// ==========================================
-// RUTE INTEGRASI API MARKETPLACE (PUBLIC/TEST)
-// ==========================================
+// ====================================================
+// 🌐 RUTE INTEGRASI API MARKETPLACE (PUBLIC / TESTING)
+// ====================================================
 // Route untuk uji coba mengambil data NFT berdasarkan slug koleksinya
 Route::get('/fetch-opensea/{slug}', [OpenSeaController::class, 'fetchOpenSeaData']);
 
@@ -88,3 +75,11 @@ Route::get('/fetch-magiceden/{mint}', [OpenSeaController::class, 'fetchMagicEden
 
 // Route untuk batch fetch dari multiple platforms
 Route::post('/fetch-batch', [OpenSeaController::class, 'fetchBatch']);
+
+Route::middleware(['auth'])->group(function () {
+    // Route halaman hasil di browser
+    Route::get('/topsis/hasil', [TopsisController::class, 'hasil'])->name('topsis.hasil');
+    
+    // 🚀 ROUTE BARU KHUSUS CETAK PDF
+    Route::get('/topsis/cetak-pdf', [TopsisController::class, 'cetakPdf'])->name('topsis.cetak');
+});

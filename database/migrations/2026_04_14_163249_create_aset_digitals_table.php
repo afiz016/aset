@@ -11,12 +11,15 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('aset_digitals', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_aset');        // Nama skin / item NFT
-            $table->string('jenis_aset');       // Kategori game atau jenis aset
-            $table->timestamps();
-            });
+    Schema::create('aset_digitals', function (Blueprint $table) {
+        $table->id();
+        $table->string('nama_aset');        // Nama skin / item NFT
+        $table->string('jenis_aset');       // Kategori game atau platform bursa
+        $table->string('foto_url')->nullable(); // TAMBAHKAN INI: Untuk menyimpan link gambar asli
+        $table->string('platform_url')->nullable(); 
+        $table->text('raw_data')->nullable();
+        $table->timestamps();
+    });
     }
 
     /**
