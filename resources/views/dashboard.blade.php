@@ -226,6 +226,17 @@
     }
     .ticker-item i { font-size: 18px; display: inline-block; line-height: 1; }
     @keyframes marquee { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-50%, 0, 0); } }
+
+    /* ── SCROLLBAR — menyesuaikan background ── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--color-background-primary); }
+    ::-webkit-scrollbar-thumb { background: rgba(0, 212, 255, 0.15); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(0, 212, 255, 0.35); }
+    [data-theme="light"] ::-webkit-scrollbar-track,
+    .light ::-webkit-scrollbar-track { background: #f1f5f9; }
+    [data-theme="light"] ::-webkit-scrollbar-thumb,
+    .light ::-webkit-scrollbar-thumb { background: rgba(15,23,42,0.12); }
+    html { scrollbar-width: thin; scrollbar-color: rgba(0,212,255,0.15) var(--color-background-primary); }
 </style>
 
 <div class="D">
@@ -255,18 +266,71 @@
 
         <div class="ticker-wrap">
             <div class="ticker-content">
+                @php
+                    // Ikon berdasarkan jenis aset
+                    $iconMap = [
+                        'nft'        => ['icon' => 'ti-box',               'color' => '#a78bfa'],
+                        'opensea'    => ['icon' => 'ti-anchor',             'color' => '#60a5fa'],
+                        'ethereum'   => ['icon' => 'ti-currency-ethereum',  'color' => '#818cf8'],
+                        'steam'      => ['icon' => 'ti-brand-steam',        'color' => '#00d4ff'],
+                        'cs2'        => ['icon' => 'ti-diamond',            'color' => '#00d4ff'],
+                        'csgo'       => ['icon' => 'ti-diamond',            'color' => '#00d4ff'],
+                        'dota'       => ['icon' => 'ti-sword',              'color' => '#f59e0b'],
+                        'dota2'      => ['icon' => 'ti-sword',              'color' => '#f59e0b'],
+                        'axie'       => ['icon' => 'ti-device-gamepad-2',   'color' => '#22c55e'],
+                        'solana'     => ['icon' => 'ti-layers-subtract',    'color' => '#9333ea'],
+                        'bitcoin'    => ['icon' => 'ti-currency-bitcoin',   'color' => '#f59e0b'],
+                        'default'    => ['icon' => 'ti-asset',              'color' => '#94a3b8'],
+                    ];
+
+                    function getTickerIcon(string $jenis, array $map): array {
+                        $j = strtolower($jenis);
+                        foreach ($map as $key => $val) {
+                            if ($key !== 'default' && str_contains($j, $key)) return $val;
+                        }
+                        return $map['default'];
+                    }
+                @endphp
+
+                {{-- Render dua group identik agar marquee seamless loop --}}
+                @for($g = 0; $g < 2; $g++)
                 <div class="ticker-group">
-                    <div class="ticker-item"><i class="ti ti-currency-bitcoin text-warning"></i> Bitcoin (BTC) <span class="text-info">$64,230</span> <span class="text-success">▲ 2.4%</span></div>
-                    <div class="ticker-item"><i class="ti ti-diamond text-info"></i> CS:GO Dragon Lore <span class="text-info">$8,500</span> <span class="text-success">▲ 0.5%</span></div>
-                    <div class="ticker-item"><i class="ti ti-currency-ethereum text-secondary"></i> Ethereum (ETH) <span class="text-info">$3,450</span> <span class="text-danger">▼ 1.2%</span></div>
-                    <div class="ticker-item"><i class="ti ti-device-gamepad text-primary"></i> Axie Infinity (AXS) <span class="text-info">$45.20</span> <span class="text-success">▲ 5.1%</span></div>
+                    @forelse($tickerAsets as $ta)
+                    @php
+                        $ic = getTickerIcon($ta['jenis_aset'], $iconMap);
+                        $skor = $ta['preferensi'];
+                        // Tentukan arah dan warna berdasarkan skor preferensi
+                        if ($skor === null) {
+                            $arrow = ''; $arrowColor = '#94a3b8'; $skorLabel = '';
+                        } elseif ($skor >= 0.6) {
+                            $arrow = '▲'; $arrowColor = '#22c55e';
+                            $skorLabel = number_format($skor * 100, 1) . '%';
+                        } elseif ($skor >= 0.4) {
+                            $arrow = '◆'; $arrowColor = '#f59e0b';
+                            $skorLabel = number_format($skor * 100, 1) . '%';
+                        } else {
+                            $arrow = '▼'; $arrowColor = '#ef4444';
+                            $skorLabel = number_format($skor * 100, 1) . '%';
+                        }
+                    @endphp
+                    <div class="ticker-item">
+                        <i class="ti {{ $ic['icon'] }}" style="color:{{ $ic['color'] }};"></i>
+                        <span style="color:var(--color-text-primary);font-weight:600;">{{ $ta['nama_aset'] }}</span>
+                        @if($skor !== null)
+                            <span style="color:#00d4ff;font-family:'JetBrains Mono',monospace;font-size:0.95rem;">V={{ number_format($skor, 4) }}</span>
+                            <span style="color:{{ $arrowColor }};font-weight:700;font-size:0.9rem;">{{ $arrow }} {{ $skorLabel }}</span>
+                        @else
+                            <span style="color:#64748b;font-size:0.85rem;">{{ $ta['jenis_aset'] }}</span>
+                        @endif
+                    </div>
+                    @empty
+                    <div class="ticker-item">
+                        <i class="ti ti-info-circle" style="color:#94a3b8;"></i>
+                        <span style="color:#94a3b8;">Belum ada data aset — silakan tambah aset terlebih dahulu</span>
+                    </div>
+                    @endforelse
                 </div>
-                <div class="ticker-group">
-                    <div class="ticker-item"><i class="ti ti-currency-bitcoin text-warning"></i> Bitcoin (BTC) <span class="text-info">$64,230</span> <span class="text-success">▲ 2.4%</span></div>
-                    <div class="ticker-item"><i class="ti ti-diamond text-info"></i> CS:GO Dragon Lore <span class="text-info">$8,500</span> <span class="text-success">▲ 0.5%</span></div>
-                    <div class="ticker-item"><i class="ti ti-currency-ethereum text-secondary"></i> Ethereum (ETH) <span class="text-info">$3,450</span> <span class="text-danger">▼ 1.2%</span></div>
-                    <div class="ticker-item"><i class="ti ti-device-gamepad text-primary"></i> Axie Infinity (AXS) <span class="text-info">$45.20</span> <span class="text-success">▲ 5.1%</span></div>
-                </div>
+                @endfor
             </div>
         </div>
 
@@ -314,39 +378,38 @@
                         <span class="badge b-teal">Live</span>
                     </div>
                     <div class="rank-list">
+                        @forelse($daftarRanking as $idx => $r)
+                        @php
+                            $vi     = $r['preferensi'];
+                            $isGold = $idx === 0;
+                            $barAm  = $vi < 0.6;   // amber bar untuk skor rendah
+
+                            // Badge rekomendasi
+                            if ($vi >= 0.8)      { $badgeClass = 'b-teal';   $badgeText = 'Strong Buy'; }
+                            elseif ($vi >= 0.6)  { $badgeClass = 'b-amber';  $badgeText = 'Buy'; }
+                            elseif ($vi >= 0.4)  { $badgeClass = 'b-purple'; $badgeText = 'Hold'; }
+                            else                 { $badgeClass = 'b-red';    $badgeText = 'Avoid'; }
+
+                            $namaDisplay = strtoupper(str_replace('-', ' ', $r['nama_aset']));
+                            $jenis       = ucfirst($r['jenis_aset'] ?? '-');
+                        @endphp
                         <div class="rank-row">
-                            <div class="rn gold">01</div>
+                            <div class="rn {{ $isGold ? 'gold' : '' }}">{{ str_pad($idx + 1, 2, '0', STR_PAD_LEFT) }}</div>
                             <div>
-                                <div class="asset-name">{{ $asetTerbaik ? $asetTerbaik['nama_aset'] : 'Dragon Lore AK-47' }}</div>
-                                <div class="asset-game">Counter-Strike 2 · <span class="badge b-amber">Solusi Utama</span></div>
+                                <div class="asset-name" title="{{ $r['nama_aset'] }}">{{ $namaDisplay }}</div>
+                                <div class="asset-game">{{ $jenis }} · <span class="badge {{ $badgeClass }}">{{ $badgeText }}</span></div>
                             </div>
-                            <div class="score-num">{{ $asetTerbaik ? number_format($asetTerbaik['preferensi'], 3) : '0.847' }}</div>
-                            <div class="bar-bg"><div class="bar-fill" data-w="{{ $asetTerbaik ? $asetTerbaik['preferensi'] * 100 : '84.7' }}"></div></div>
+                            <div class="score-num">{{ number_format($vi, 3) }}</div>
+                            <div class="bar-bg">
+                                <div class="bar-fill {{ $barAm ? 'am' : '' }}" data-w="{{ $vi * 100 }}"></div>
+                            </div>
                         </div>
-                        <div class="rank-row">
-                            <div class="rn">02</div>
-                            <div><div class="asset-name">Bayonet Marble Fade</div><div class="asset-game">Counter-Strike 2 · <span class="badge b-amber">Covert</span></div></div>
-                            <div class="score-num">0.791</div>
-                            <div class="bar-bg"><div class="bar-fill" data-w="79.1"></div></div>
+                        @empty
+                        <div style="padding:32px 22px; text-align:center; color:var(--color-text-secondary); font-size:13px;">
+                            <i class="ti ti-database-off" style="font-size:28px;display:block;margin-bottom:8px;"></i>
+                            Belum ada data ranking. Lengkapi penilaian terlebih dahulu.
                         </div>
-                        <div class="rank-row">
-                            <div class="rn">03</div>
-                            <div><div class="asset-name">Arcana Phantom Assn.</div><div class="asset-game">Dota 2 · <span class="badge b-purple">Arcana</span></div></div>
-                            <div class="score-num">0.724</div>
-                            <div class="bar-bg"><div class="bar-fill" data-w="72.4"></div></div>
-                        </div>
-                        <div class="rank-row">
-                            <div class="rn">04</div>
-                            <div><div class="asset-name">Immortal Wraith King</div><div class="asset-game">Dota 2 · <span class="badge b-teal">Immortal</span></div></div>
-                            <div class="score-num">0.663</div>
-                            <div class="bar-bg"><div class="bar-fill am" data-w="66.3"></div></div>
-                        </div>
-                        <div class="rank-row">
-                            <div class="rn">05</div>
-                            <div><div class="asset-name">M4A4 Howl</div><div class="asset-game">Counter-Strike 2 · <span class="badge b-red">Contraband</span></div></div>
-                            <div class="score-num">0.612</div>
-                            <div class="bar-bg"><div class="bar-fill am" data-w="61.2"></div></div>
-                        </div>
+                        @endforelse
                     </div>
                 </div>
 
@@ -357,49 +420,67 @@
                             <a href="{{ route('kriteria.index') }}" class="icon-btn" style="width:22px; height:22px; border:none; color:var(--color-text-secondary);"><i class="ti ti-edit" style="font-size:12px;" aria-hidden="true"></i></a>
                         </div>
                         <div style="padding:8px 14px;">
+                            @php
+                                $kritIcons = [
+                                    'harga'      => ['icon'=>'ti-coin',         'bg'=>'rgba(239,68,68,0.1)',    'color'=>'#ef4444'],
+                                    'volume'     => ['icon'=>'ti-activity',     'bg'=>'rgba(0,212,255,0.1)',    'color'=>'var(--accent-cyan)'],
+                                    'rarity'     => ['icon'=>'ti-diamond',      'bg'=>'rgba(99,102,241,0.1)',   'color'=>'#6366f1'],
+                                    'sentiment'  => ['icon'=>'ti-trending-up',  'bg'=>'rgba(245,158,11,0.1)',   'color'=>'#f59e0b'],
+                                    'likuid'     => ['icon'=>'ti-droplet',      'bg'=>'rgba(0,212,255,0.1)',    'color'=>'var(--accent-cyan)'],
+                                    'default'    => ['icon'=>'ti-adjustments',  'bg'=>'rgba(148,163,184,0.1)', 'color'=>'#94a3b8'],
+                                ];
+                                function getKritIcon(string $nama, array $map): array {
+                                    $n = strtolower($nama);
+                                    if (str_contains($n,'harga') || str_contains($n,'beli') || str_contains($n,'cost')) return $map['harga'];
+                                    if (str_contains($n,'volume') || str_contains($n,'transaksi')) return $map['volume'];
+                                    if (str_contains($n,'rarity') || str_contains($n,'langka') || str_contains($n,'kelangkaan')) return $map['rarity'];
+                                    if (str_contains($n,'sentiment') || str_contains($n,'pasar')) return $map['sentiment'];
+                                    if (str_contains($n,'likuid')) return $map['likuid'];
+                                    return $map['default'];
+                                }
+                            @endphp
+                            @forelse($kriterias as $kr)
+                            @php $ki = getKritIcon($kr->nama_kriteria, $kritIcons); @endphp
                             <div class="crit-row">
-                                <div class="crit-icon" style="background:rgba(239,68,68,0.1);"><i class="ti ti-coin" style="font-size:13px;color:#ef4444;" aria-hidden="true"></i></div>
-                                <div class="crit-name">Harga Beli</div>
-                                <span class="crit-type b-red badge">Cost</span>
-                                <div class="crit-w">20%</div>
+                                <div class="crit-icon" style="background:{{ $ki['bg'] }};"><i class="ti {{ $ki['icon'] }}" style="font-size:13px;color:{{ $ki['color'] }};" aria-hidden="true"></i></div>
+                                <div class="crit-name">{{ $kr->nama_kriteria }}</div>
+                                <span class="crit-type {{ strtolower($kr->jenis)==='benefit' ? 'b-teal' : 'b-red' }} badge">{{ ucfirst($kr->jenis) }}</span>
+                                <div class="crit-w">{{ $kr->bobot }}</div>
                             </div>
-                            <div class="crit-row">
-                                <div class="crit-icon" style="background:rgba(0, 212, 255, 0.1);"><i class="ti ti-activity" style="font-size:13px;color:var(--accent-cyan);" aria-hidden="true"></i></div>
-                                <div class="crit-name">Volume Transaksi</div>
-                                <span class="crit-type b-teal badge">Benefit</span>
-                                <div class="crit-w">25%</div>
-                            </div>
-                            <div class="crit-row">
-                                <div class="crit-icon" style="background:rgba(99,102,241,0.1);"><i class="ti ti-diamond" style="font-size:13px;color:#6366f1;" aria-hidden="true"></i></div>
-                                <div class="crit-name">Tingkat Rarity</div>
-                                <span class="crit-type b-purple badge">Benefit</span>
-                                <div class="crit-w">25%</div>
-                            </div>
-                            <div class="crit-row">
-                                <div class="crit-icon" style="background:rgba(245,158,11,0.1);"><i class="ti ti-trending-up" style="font-size:13px;color:#f59e0b;" aria-hidden="true"></i></div>
-                                <div class="crit-name">Market Sentiment</div>
-                                <span class="crit-type b-teal badge">Benefit</span>
-                                <div class="crit-w">15%</div>
-                            </div>
-                            <div class="crit-row">
-                                <div class="crit-icon" style="background:rgba(0, 212, 255, 0.1);"><i class="ti ti-droplet" style="font-size:13px;color:var(--accent-cyan);" aria-hidden="true"></i></div>
-                                <div class="crit-name">Likuiditas</div>
-                                <span class="crit-type b-teal badge">Benefit</span>
-                                <div class="crit-w">15%</div>
-                            </div>
+                            @empty
+                            <div style="padding:16px;text-align:center;color:var(--color-text-secondary);font-size:12px;">Belum ada kriteria.</div>
+                            @endforelse
                         </div>
                     </div>
 
                     <div class="card">
-                        <div class="card-head"><div class="card-title">Notifikasi Pasar</div><span class="badge b-red">3 baru</span></div>
+                        <div class="card-head">
+                            <div class="card-title">Notifikasi Pasar</div>
+                            <span class="badge b-teal">Info</span>
+                        </div>
                         <div style="padding:8px 14px;">
+                            @if($asetTerbaik)
                             <div class="alert-row">
                                 <div class="alert-dot" style="background:var(--accent-cyan);"></div>
-                                <div><div class="alert-text">Dragon Lore naik 8.3% dalam 2 jam terakhir</div><div class="alert-time">14 menit lalu</div></div>
+                                <div>
+                                    <div class="alert-text">{{ strtoupper(str_replace('-',' ',$asetTerbaik['nama_aset'])) }} meraih skor tertinggi {{ number_format($asetTerbaik['preferensi'],4) }}</div>
+                                    <div class="alert-time">Hasil perhitungan TOPSIS terbaru</div>
+                                </div>
                             </div>
+                            @endif
                             <div class="alert-row">
                                 <div class="alert-dot" style="background:#f59e0b;"></div>
-                                <div><div class="alert-text">Volume M4A4 Howl menurun 15% hari ini</div><div class="alert-time">1 jam lalu</div></div>
+                                <div>
+                                    <div class="alert-text">{{ $totalAsetDigital }} aset terdaftar · {{ $totalPenilaian }} data penilaian</div>
+                                    <div class="alert-time">{{ $rataRataPenilaian }}% matriks terisi</div>
+                                </div>
+                            </div>
+                            <div class="alert-row">
+                                <div class="alert-dot" style="background:#6366f1;"></div>
+                                <div>
+                                    <div class="alert-text">{{ $totalKriteria }} kriteria aktif dalam sistem</div>
+                                    <div class="alert-time">Manajemen kriteria</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -407,56 +488,47 @@
             </div>
 
             <div class="bottom-grid">
+                {{-- CHART: Distribusi Aset per Platform pakai Chart.js --}}
                 <div class="card">
-                    <div class="card-head"><div class="card-title">Distribusi Volume per Platform</div><span class="badge b-teal">7 hari</span></div>
-                    <div class="mini-chart">
-                        <div class="chart-bars">
-                            <div class="cbar" style="height:80%; background:var(--accent-cyan);"></div>
-                            <div class="cbar" style="height:55%; background:var(--accent-cyan); opacity:.7;"></div>
-                            <div class="cbar" style="height:65%; background:var(--accent-cyan); opacity:.6;"></div>
-                            <div class="cbar" style="height:42%; background:#f59e0b;"></div>
-                            <div class="cbar" style="height:30%; background:#f59e0b; opacity:.7;"></div>
-                            <div class="cbar" style="height:20%; background:#6366f1;"></div>
-                            <div class="cbar" style="height:15%; background:#6366f1; opacity:.7;"></div>
-                        </div>
-                        <div class="chart-labels">
-                            <div class="clabel">Steam</div>
-                            <div class="clabel">CS2</div>
-                            <div class="clabel">DMarket</div>
-                            <div class="clabel">Dota2</div>
-                            <div class="clabel">Skinport</div>
-                            <div class="clabel">OpenSea</div>
-                            <div class="clabel">Rarible</div>
-                        </div>
-                        <div style="display:flex; gap:12px; margin-top:14px; font-family: var(--font-sans);">
-                            <div style="display:flex; align-items:center; gap:4px; font-size:10px; color:var(--color-text-secondary);"><div style="width:8px; height:8px; border-radius:2px; background:var(--accent-cyan);"></div>Counter-Strike</div>
-                            <div style="display:flex; align-items:center; gap:4px; font-size:10px; color:var(--color-text-secondary);"><div style="width:8px; height:8px; border-radius:2px; background:#f59e0b;"></div>Dota 2</div>
-                        </div>
+                    <div class="card-head">
+                        <div class="card-title">Distribusi Aset per Platform</div>
+                        <span class="badge b-teal">{{ $totalAsetDigital }} Aset</span>
+                    </div>
+                    <div style="padding: 20px 22px 16px; position:relative; height:220px;">
+                        <canvas id="platformChart"></canvas>
                     </div>
                 </div>
 
+                {{-- RING: Komposisi Platform pakai Chart.js Doughnut --}}
                 <div class="card">
-                    <div class="card-head"><div class="card-title">Distribusi Rarity Aset</div><span class="badge b-purple">{{ $totalAsetDigital }} aset</span></div>
-                    <div style="display:flex; align-items:center; padding:10px 18px 14px;">
-                        <div class="progress-ring">
-                            <div class="ring-wrap">
-                                <svg viewBox="0 0 90 90">
-                                    <circle cx="45" cy="45" r="35" fill="none" stroke-width="10" stroke="var(--color-background-primary)"/>
-                                    <circle cx="45" cy="45" r="35" fill="none" stroke-width="10" stroke="var(--accent-cyan)" stroke-dasharray="66 154" stroke-dashoffset="0" stroke-linecap="round"/>
-                                    <circle cx="45" cy="45" r="35" fill="none" stroke-width="10" stroke="#f59e0b" stroke-dasharray="44 176" stroke-dashoffset="-66" stroke-linecap="round"/>
-                                    <circle cx="45" cy="45" r="35" fill="none" stroke-width="10" stroke="#6366f1" stroke-dasharray="33 187" stroke-dashoffset="-110" stroke-linecap="round"/>
-                                    <circle cx="45" cy="45" r="35" fill="none" stroke-width="10" stroke="#ef4444" stroke-dasharray="17 203" stroke-dashoffset="-143" stroke-linecap="round"/>
-                                </svg>
-                                <div class="ring-center">
-                                    <div class="ring-val">{{ $totalAsetDigital }}</div>
-                                    <div class="ring-label">total</div>
-                                </div>
+                    <div class="card-head">
+                        <div class="card-title">Komposisi Platform</div>
+                        <span class="badge b-purple">{{ $totalAsetDigital }} aset</span>
+                    </div>
+                    <div style="display:flex; align-items:center; padding:14px 18px 14px; gap:16px;">
+                        <div style="position:relative; width:130px; height:130px; flex-shrink:0;">
+                            <canvas id="doughnutChart" width="130" height="130"></canvas>
+                            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;">
+                                <span style="font-size:24px;font-weight:700;color:var(--color-text-primary);">{{ $totalAsetDigital }}</span>
+                                <span style="font-size:10px;color:var(--color-text-secondary);text-transform:uppercase;font-weight:700;letter-spacing:.5px;">total</span>
                             </div>
                         </div>
-                        <div class="ring-info">
-                            <div class="ri-row"><span style="display:flex; align-items:center; color:var(--color-text-primary);"><div class="ri-dot" style="background:var(--accent-cyan);"></div>Covert</span><span>42%</span></div>
-                            <div class="ri-row"><span style="display:flex; align-items:center; color:var(--color-text-primary);"><div class="ri-dot" style="background:#f59e0b;"></div>Immortal</span><span>29%</span></div>
-                            <div class="ri-row"><span style="display:flex; align-items:center; color:var(--color-text-primary);"><div class="ri-dot" style="background:#6366f1;"></div>Arcana</span><span>21%</span></div>
+                        <div class="ring-info" style="flex:1;">
+                            @php $ringColors = ['#00d4ff','#f59e0b','#6366f1','#ef4444','#22c55e','#ec4899']; @endphp
+                            @foreach($distribusiPlatform as $idx => $dp)
+                            @php $rc = $ringColors[$idx % count($ringColors)]; @endphp
+                            <div class="ri-row">
+                                <span style="display:flex;align-items:center;color:var(--color-text-primary);">
+                                    <div class="ri-dot" style="background:{{ $rc }};"></div>{{ $dp['platform'] }}
+                                </span>
+                                <span style="font-weight:700;color:var(--color-text-primary);">
+                                    {{ $dp['jumlah'] }}
+                                    <span style="color:var(--color-text-secondary);font-weight:400;font-size:11px;">
+                                        ({{ $totalAsetDigital > 0 ? round($dp['jumlah']/$totalAsetDigital*100) : 0 }}%)
+                                    </span>
+                                </span>
+                            </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -466,6 +538,7 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         // ANIMASI LOADING TRACER PROGRESS BAR RANKING
@@ -491,20 +564,125 @@
 
         function applyTheme(theme) {
             htmlElement.setAttribute('data-theme', theme);
-
             if (theme === 'light') {
-                htmlElement.classList.remove('dark');
-                htmlElement.classList.add('light');
-                bodyElement.classList.remove('dark');
-                bodyElement.classList.add('light');
+                htmlElement.classList.remove('dark'); htmlElement.classList.add('light');
+                bodyElement.classList.remove('dark'); bodyElement.classList.add('light');
                 themeIcon.className = 'ti ti-moon text-primary';
             } else {
-                htmlElement.classList.remove('light');
-                htmlElement.classList.add('dark');
-                bodyElement.classList.remove('light');
-                bodyElement.classList.add('dark');
+                htmlElement.classList.remove('light'); htmlElement.classList.add('dark');
+                bodyElement.classList.remove('light'); bodyElement.classList.add('dark');
                 themeIcon.className = 'ti ti-sun text-warning';
             }
+        }
+
+        // ── DATA DARI BLADE ──
+        const platformLabels = @json($distribusiPlatform->pluck('platform'));
+        const platformData   = @json($distribusiPlatform->pluck('jumlah'));
+        const chartColors    = ['#00d4ff','#f59e0b','#6366f1','#ef4444','#22c55e','#ec4899','#14b8a6','#a78bfa'];
+        const barColors      = platformData.map((_, i) => chartColors[i % chartColors.length]);
+
+        // ── BAR CHART — Distribusi per Platform ──
+        const barCtx = document.getElementById('platformChart');
+        if (barCtx) {
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: platformLabels,
+                    datasets: [{
+                        label: 'Jumlah Aset',
+                        data: platformData,
+                        backgroundColor: barColors.map(c => c + '22'),
+                        borderColor: barColors,
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            borderColor: 'rgba(0,212,255,0.2)',
+                            borderWidth: 1,
+                            titleColor: '#00d4ff',
+                            bodyColor: '#f1f5f9',
+                            padding: 10,
+                            callbacks: {
+                                label: ctx => ` ${ctx.parsed.y} aset`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: {
+                                color: '#64748b',
+                                font: { size: 11, weight: '600' }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(148,163,184,0.06)',
+                                drawBorder: false
+                            },
+                            border: { display: false, dash: [4,4] },
+                            ticks: {
+                                color: '#64748b',
+                                font: { size: 10 },
+                                stepSize: 1,
+                                padding: 8
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    animation: {
+                        duration: 900,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+
+        // ── DOUGHNUT CHART — Komposisi Platform ──
+        const dCtx = document.getElementById('doughnutChart');
+        if (dCtx) {
+            new Chart(dCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: platformLabels,
+                    datasets: [{
+                        data: platformData,
+                        backgroundColor: barColors.map(c => c + '33'),
+                        borderColor: barColors,
+                        borderWidth: 2,
+                        hoverBorderWidth: 3,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    cutout: '68%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            borderColor: 'rgba(0,212,255,0.2)',
+                            borderWidth: 1,
+                            titleColor: '#00d4ff',
+                            bodyColor: '#f1f5f9',
+                            padding: 10,
+                            callbacks: {
+                                label: ctx => ` ${ctx.label}: ${ctx.parsed} aset`
+                            }
+                        }
+                    },
+                    animation: { duration: 900, easing: 'easeOutQuart' }
+                }
+            });
         }
     });
 </script>

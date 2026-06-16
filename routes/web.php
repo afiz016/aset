@@ -35,6 +35,7 @@ Route::middleware(['auth'])->group(function () {
 
     // 3. Route Perhitungan & Hasil Akhir TOPSIS
     Route::get('/topsis/hasil', [TopsisController::class, 'hitung'])->name('topsis.hasil');
+    Route::get('/topsis/perhitungan', [TopsisController::class, 'perhitungan'])->name('topsis.perhitungan');
     
     // 🚀 TOMBOL CETAK PDF BARU (LANGSUNG DOWNLOAD SINKRON DENGAN SERVICE)
     Route::get('/topsis/cetak-pdf', [TopsisController::class, 'cetakPdf'])->name('topsis.cetak');
@@ -77,9 +78,6 @@ Route::get('/fetch-magiceden/{mint}', [OpenSeaController::class, 'fetchMagicEden
 Route::post('/fetch-batch', [OpenSeaController::class, 'fetchBatch']);
 
 Route::middleware(['auth'])->group(function () {
-    // Route halaman hasil di browser
-    Route::get('/topsis/hasil', [TopsisController::class, 'hasil'])->name('topsis.hasil');
-    
-    // 🚀 ROUTE BARU KHUSUS CETAK PDF
-    Route::get('/topsis/cetak-pdf', [TopsisController::class, 'cetakPdf'])->name('topsis.cetak');
+    // Route halaman hasil di browser - sudah didefinisikan di group auth atas
+    // Tidak perlu duplikat di sini
 });

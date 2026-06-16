@@ -227,12 +227,15 @@
     .btn-action-delete:hover { color: #ef4444; border-color: #ef4444; background: rgba(239, 68, 68, 0.05); }
 </style>
 
-<header class="w-full h-16 border-b d-flex justify-content-end align-items-center px-4 gap-3" style="background: var(--color-background-secondary); border-color: var(--color-border-tertiary) !important;">
+<div class="w-full border-b d-flex justify-content-between align-items-center px-4 py-3 mb-0" style="background: var(--color-background-secondary); border-color: var(--color-border-tertiary) !important; min-height: 70px; box-sizing: border-box; border-bottom: 0.5px solid var(--color-border-tertiary) !important;">
+    <div style="font-size: 15px; font-weight: 700; color: var(--accent-cyan); letter-spacing: 0.5px; display: inline-flex; align-items: center; margin: 0; padding: 0; line-height: 1; font-family: 'JetBrains Mono', monospace;">
+        LANGKAH 2: ALTERNATIF ASET DIGITAL
+    </div>
     <div class="d-flex align-items-center gap-3">
         <div class="icon-btn" id="themeToggle" title="Ubah Tema"><i class="ti ti-sun" id="themeIcon" aria-hidden="true"></i></div>
         <div class="icon-btn" onclick="window.location.reload();" title="Refresh Data"><i class="ti ti-refresh" aria-hidden="true"></i></div>
     </div>
-</header>
+</div>
 
 <div class="D-container">
     
@@ -256,7 +259,6 @@
 
     <div class="d-flex justify-content-between align-items-center mb-2">
         <div>
-            <h2 class="fw-bold mb-1" style="color: var(--color-text-primary); font-size: 24px;">Langkah 2: Alternatif Aset Digital</h2>
             <p style="color: var(--color-text-secondary); font-size: 14px;" class="mb-0">Daftarkan dan analisis portofolio alternatif investasi aset digital Anda.</p>
         </div>
         <div class="d-flex gap-2">

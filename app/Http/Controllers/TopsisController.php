@@ -2,47 +2,105 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\TopsisService;
+use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Kriteria;
-// 🚀 IMPORT FACADE DOMPDF
-use Barryvdh\DomPDF\Facade\Pdf; 
+use App\Services\TopsisService;
 
 class TopsisController extends Controller
 {
     protected $topsisService;
 
-    // Masukkan TopsisService lewat Dependency Injection
     public function __construct(TopsisService $topsisService)
     {
         $this->topsisService = $topsisService;
     }
 
+    /**
+     * Halaman hasil perhitungan TOPSIS di browser.
+     */
     public function hitung()
     {
-        // 1. Eksekusi service perhitungan TOPSIS
-        $hasilTopsis = $this->topsisService->hitungTopsis();
-        
-        // 2. Kirim hasilnya ke view dengan nama variabel yang benar
-        return view('topsis.hasil', compact('hasilTopsis'));
+        $topsisResult = $this->topsisService->hitungTopsis();
+
+        $ranking = !empty($topsisResult) && isset($topsisResult['hasil_akhir'])
+            ? $topsisResult['hasil_akhir']
+            : [];
+
+        return view('topsis.hasil', compact('ranking'));
     }
 
-    // 🚀 FUNGSI BARU: LANGSUNG DOWNLOAD PDF SINKRON DENGAN SERVICE
-    public function cetakPdf()
+    /**
+     * Halaman detail tahap-tahap perhitungan TOPSIS (matriks, normalisasi, bobot, dll).
+     */
+    public function perhitungan()
     {
-        // 1. Eksekusi service perhitungan yang sama persis agar datanya sinkron
-        $hasilTopsis = $this->topsisService->hitungTopsis();
-        
-        // 2. Ambil meta data tambahan untuk kelengkapan laporan TA
+        $topsisResult = $this->topsisService->hitungTopsis();
+
+        if (empty($topsisResult)) {
+            return view('topsis.perhitungan', [
+                'kriterias'            => collect(),
+                'asetDigitals'         => collect(),
+                'matriksX'             => [],
+                'matriksR'             => [],
+                'matriksV'             => [],
+                'solusiIdealPositif'   => [],
+                'solusiIdealNegatif'   => [],
+                'jarakPositif'         => [],
+                'jarakNegatif'         => [],
+                'hasilAkhir'           => [],
+            ]);
+        }
+
+        return view('topsis.perhitungan', [
+            'kriterias'            => $topsisResult['kriterias'],
+            'asetDigitals'         => $topsisResult['aset_digitals'],
+            'matriksX'             => $topsisResult['matriks_x'],
+            'matriksR'             => $topsisResult['matriks_r'],
+            'matriksV'             => $topsisResult['matriks_v'],
+            'solusiIdealPositif'   => $topsisResult['solusi_ideal_positif'],
+            'solusiIdealNegatif'   => $topsisResult['solusi_ideal_negatif'],
+            'jarakPositif'         => $topsisResult['jarak_solusi_ideal_positif'],
+            'jarakNegatif'         => $topsisResult['jarak_solusi_ideal_negatif'],
+            'hasilAkhir'           => $topsisResult['hasil_akhir'],
+        ]);
+    }
+
+    /**
+     * Cetak laporan PDF hasil TOPSIS.
+     * Bisa dipanggil dari halaman Dashboard maupun halaman Hasil TOPSIS.
+     */
+    public function cetakPdf(Request $request)
+    {
+        $topsisResult = $this->topsisService->hitungTopsis();
+
+        $hasilTopsis = !empty($topsisResult) && isset($topsisResult['hasil_akhir'])
+            ? $topsisResult['hasil_akhir']
+            : [];
+
         $jumlahKriteria = Kriteria::count();
-        $tglCetak = now()->translatedFormat('d F Y H:i'); // Format waktu Indonesia
+        $tglCetak       = date('d F Y H:i');
 
-        // 3. Render ke view khusus cetak PDF dengan variabel hasilTopsis
-        $pdf = Pdf::loadView('topsis.cetak_pdf', compact('hasilTopsis', 'jumlahKriteria', 'tglCetak'));
-        
-        // 4. Atur ukuran kertas ke A4 Portrait
-        $pdf->setPaper('a4', 'portrait');
+        // Deteksi sumber pemanggil (dashboard atau halaman topsis)
+        if ($request->get('source') === 'dashboard') {
+            $judulLaporan  = 'LAPORAN RINGKASAN REKOMENDASI - DASHBOARD';
+            $subJudul      = 'Ringkasan Utama Pemeringkatan Alternatif Aset Digital';
+            $sumberHalaman = 'Halaman Dashboard';
+        } else {
+            $judulLaporan  = 'LAPORAN HASIL PERHITUNGAN METODE TOPSIS';
+            $subJudul      = 'Hasil Detail Analisis Solusi Ideal Positif dan Negatif';
+            $sumberHalaman = 'Halaman Hasil TOPSIS';
+        }
 
-        // 5. Langsung memicu browser untuk download otomatis berkas PDF
-        return $pdf->download('Laporan-Hasil-TOPSIS-' . now()->format('YmdHi') . '.pdf');
+        $pdf = Pdf::loadView('topsis.laporan_pdf', compact(
+            'hasilTopsis',
+            'jumlahKriteria',
+            'tglCetak',
+            'judulLaporan',
+            'subJudul',
+            'sumberHalaman'
+        ));
+
+        return $pdf->download('Laporan_TOPSIS_' . date('Ymd_His') . '.pdf');
     }
 }

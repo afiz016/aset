@@ -17,29 +17,28 @@ class DashboardController extends Controller
     }
     public function exportPdf()
     {
-        $totalKriteria = Kriteria::count();
-        $totalAsetDigital = AsetDigital::count();
-        $totalPenilaian = Penilaian::count();
-
         // Mengambil hasil komputasi TOPSIS lengkap dari Service
         $topsisResult = $this->topsisService->hitungTopsis();
-        
-        $daftarRanking = !empty($topsisResult) && isset($topsisResult['hasil_akhir']) 
-            ? $topsisResult['hasil_akhir'] 
-            : [];
-            
-        $asetTerbaik = !empty($daftarRanking) ? $daftarRanking[0] : null;
 
-        // Load halaman khusus cetak PDF dengan data dinamis
+        $hasilTopsis = !empty($topsisResult) && isset($topsisResult['hasil_akhir'])
+            ? $topsisResult['hasil_akhir']
+            : [];
+
+        $jumlahKriteria  = Kriteria::count();
+        $tglCetak        = date('d F Y H:i');
+        $judulLaporan    = 'LAPORAN RINGKASAN REKOMENDASI - DASHBOARD';
+        $subJudul        = 'Ringkasan Utama Pemeringkatan Alternatif Aset Digital';
+        $sumberHalaman   = 'Halaman Dashboard';
+
         $pdf = Pdf::loadView('topsis.laporan_pdf', compact(
-            'totalKriteria',
-            'totalAsetDigital',
-            'totalPenilaian',
-            'asetTerbaik',
-            'daftarRanking'
+            'hasilTopsis',
+            'jumlahKriteria',
+            'tglCetak',
+            'judulLaporan',
+            'subJudul',
+            'sumberHalaman'
         ));
 
-        // Mengunduh berkas langsung ke komputer pengguna
         return $pdf->download('Laporan-Analisis-TOPSIS-InvestGame.pdf');
     }
 
@@ -48,29 +47,67 @@ class DashboardController extends Controller
         // 1. Total Kriteria Aktif
         $totalKriteria = Kriteria::count();
 
-        // 2. Total Aset Digital yang Telah Dinilai
+        // 2. Total Aset Digital
         $totalAsetDigital = AsetDigital::count();
 
-        // 3. Total Penilaian (evaluations)
+        // 3. Total Penilaian
         $totalPenilaian = Penilaian::count();
 
-        // 4. Aset Digital dengan Skor Tertinggi (Rekomendasi Terbaik)
+        // 4. Hitung TOPSIS
         $topsisResult = $this->topsisService->hitungTopsis();
-        $asetTerbaik = !empty($topsisResult) && isset($topsisResult['hasil_akhir']) && count($topsisResult['hasil_akhir']) > 0 
-            ? $topsisResult['hasil_akhir'][0] 
-            : null;
+        $hasilAkhir   = !empty($topsisResult) && isset($topsisResult['hasil_akhir'])
+            ? collect($topsisResult['hasil_akhir'])
+            : collect();
 
-        // 5. Statistik tambahan
-        $rataRataPenilaian = $totalAsetDigital > 0 && $totalKriteria > 0 
+        $asetTerbaik = $hasilAkhir->isNotEmpty() ? $hasilAkhir->first() : null;
+
+        // 5. Kelengkapan penilaian
+        $rataRataPenilaian = $totalAsetDigital > 0 && $totalKriteria > 0
             ? round($totalPenilaian / ($totalAsetDigital * $totalKriteria) * 100, 2)
             : 0;
+
+        // 6. Ticker — aset dengan skor TOPSIS (atau tanpa skor jika belum ada)
+        if ($hasilAkhir->isNotEmpty()) {
+            $tickerAsets = $hasilAkhir->map(fn($r) => [
+                'nama_aset'  => $r['nama_aset'],
+                'jenis_aset' => $r['jenis_aset'] ?? '-',
+                'preferensi' => $r['preferensi'],
+            ]);
+        } else {
+            $tickerAsets = AsetDigital::all()->map(fn($a) => [
+                'nama_aset'  => $a->nama_aset,
+                'jenis_aset' => $a->jenis_aset,
+                'preferensi' => null,
+            ]);
+        }
+
+        // 7. Ranking top-5 untuk tabel dashboard (dari hasil TOPSIS, fallback ke list kosong)
+        $daftarRanking = $hasilAkhir->take(5)->values();
+
+        // 8. Distribusi jenis aset untuk bar chart
+        $semuaAset = AsetDigital::all();
+        $distribusiPlatform = $semuaAset
+            ->groupBy(fn($a) => strtolower($a->jenis_aset))
+            ->map(fn($group, $platform) => [
+                'platform' => ucfirst($platform),
+                'jumlah'   => $group->count(),
+            ])
+            ->sortByDesc('jumlah')
+            ->values();
+
+        // 9. Kriteria dari database untuk sidebar
+        $kriterias = \App\Models\Kriteria::all();
 
         return view('dashboard', compact(
             'totalKriteria',
             'totalAsetDigital',
             'totalPenilaian',
             'asetTerbaik',
-            'rataRataPenilaian'
+            'rataRataPenilaian',
+            'tickerAsets',
+            'daftarRanking',
+            'distribusiPlatform',
+            'kriterias'
         ));
     }
 }

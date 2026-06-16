@@ -7,7 +7,7 @@
 <!-- Ambil font dan ikon yang dibutuhkan untuk area konten -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap');
     
     /* ====================================================
        PENGATURAN VARIABEL WARNA (SYNCED WITH DASHBOARD)
@@ -240,13 +240,15 @@
 </style>
 
 <!-- 🛠️ UPGRADED HEADER: Search & Connect Wallet Dihilangkan Rapi -->
-<header class="w-full h-16 border-b d-flex justify-content-end align-items-center px-4 gap-3" style="background: var(--color-background-secondary); border-color: var(--color-border-tertiary) !important;">
+<div class="w-full border-b d-flex justify-content-between align-items-center px-4 py-3 mb-0" style="background: var(--color-background-secondary); border-color: var(--color-border-tertiary) !important; border-radius: 0; min-height: 70px; box-sizing: border-box; border-bottom: 0.5px solid var(--color-border-tertiary) !important;">
+    <div style="font-size: 15px; font-weight: 700; color: var(--accent-cyan); letter-spacing: 0.5px; display: inline-flex; align-items: center; margin: 0; padding: 0; line-height: 1; font-family: 'JetBrains Mono', 'Space Grotesk', monospace;">
+        LANGKAH 1: PEMBOBOTAN KRITERIA
+    </div>
     <div class="d-flex align-items-center gap-3">
-        <!-- Hanya Menyisakan Tombol Utama Pengaturan Tema & Refresh Sistem -->
         <div class="icon-btn" id="themeToggle" title="Ubah Tema"><i class="ti ti-sun" id="themeIcon" aria-hidden="true"></i></div>
         <div class="icon-btn" onclick="window.location.reload();" title="Refresh Data"><i class="ti ti-refresh" aria-hidden="true"></i></div>
     </div>
-</header>
+</div>
 
 <div class="D-container">
     
@@ -272,7 +274,6 @@
     <!-- Page Title Header & Tombol Tambah Kriteria Premium -->
     <div class="d-flex justify-content-between align-items-center mb-2">
         <div>
-            <h2 class="fw-bold mb-1" style="color: var(--color-text-primary); font-size: 24px;">Langkah 1: Pembobotan Kriteria</h2>
             <p style="color: var(--color-text-secondary); font-size: 14px;" class="mb-0">Tentukan tingkat kepentingan relatif untuk setiap parameter investasi. Total bobot harus berjumlah 100%.</p>
         </div>
         
