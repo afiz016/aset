@@ -28,15 +28,15 @@
     }
 
     [data-theme="light"], .light {
-        --color-background-primary: #f1f5f9;    
+        --color-background-primary: #f8fafc;    
         --color-background-secondary: #ffffff;  
         --color-text-primary: #0f172a;           
-        --color-text-secondary: #64748b;         
-        --color-border-secondary: rgba(15, 23, 42, 0.14);
-        --color-border-tertiary: rgba(15, 23, 42, 0.05);
-        --ticker-bg: #e2e8f0;
-        --ticker-border: #0284c7;
-        --accent-cyan: #0284c7;                  
+        --color-text-secondary: #475569;         
+        --color-border-secondary: rgba(15, 23, 42, 0.25);
+        --color-border-tertiary: rgba(15, 23, 42, 0.12);
+        --ticker-bg: #f1f5f9;
+        --ticker-border: #0ea5e9;
+        --accent-cyan: #0ea5e9;                  
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -121,7 +121,10 @@
     
     /* PANEL UTAMA & SIDEBAR SIZING */
     .mid-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 26px; }
-    .card { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; transition: background 0.3s; }
+    .card { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); overflow: hidden; transition: background 0.3s, box-shadow 0.3s, transform 0.3s; box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04); transform-origin: center; }
+    [data-theme="light"] .card,
+    .light .card { box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08); }
+    .card:hover { box-shadow: 0 12px 30px rgba(15, 23, 42, 0.15); transform: translateY(-3px); border-color: rgba(14, 165, 233, 0.3); }
     .card-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 0.5px solid var(--color-border-tertiary); }
     .card-title { font-size: 14px; font-weight: 700; color: var(--color-text-primary); tracking-wide; line-height: 1.4; }
     .card-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; font-family: var(--font-sans); line-height: 1.4; }
@@ -341,20 +344,22 @@
                     <div class="stat-val">{{ $totalAsetDigital }}</div>
                     <div class="stat-delta up"><i class="ti ti-arrow-up" style="font-size:10px;" aria-hidden="true"></i> Terdaftar aktif</div>
                 </div>
-                <div class="stat">
-                    <div class="stat-label"><i class="ti ti-star" aria-hidden="true"></i> Skor Tertinggi</div>
-                    <div class="stat-val font-mono" style="color: #f59e0b;">
-                        {{ $asetTerbaik ? number_format($asetTerbaik['preferensi'], 3) : '0.847' }}
+                    <div class="stat">
+                        <div class="stat-label"><i class="ti ti-star" aria-hidden="true"></i> Skor Tertinggi</div>
+                        <div class="stat-val font-mono" style="color: #f59e0b;">
+                            {{ $asetTerbaik ? number_format($asetTerbaik['preferensi'], 3) : '-' }}
+                        </div>
+                        <div class="stat-delta text-truncate" style="color:var(--color-text-secondary); display:block; max-width:180px;" title="{{ $asetTerbaik ? $asetTerbaik['nama_aset'] : '' }}">
+                            {{ $asetTerbaik ? $asetTerbaik['nama_aset'] : 'Belum ada hasil' }}
+                        </div>
                     </div>
-                    <div class="stat-delta text-truncate" style="color:var(--color-text-secondary); display:block; max-width:180px;" title="{{ $asetTerbaik ? $asetTerbaik['nama_aset'] : 'Dragon Lore' }}">
-                        {{ $asetTerbaik ? $asetTerbaik['nama_aset'] : 'Dragon Lore' }}
+                    <div class="stat">
+                        <div class="stat-label"><i class="ti ti-activity" aria-hidden="true"></i> Total Volume 24 Jam</div>
+                        <div class="stat-val font-mono">{{ number_format(round($totalVolume24h, 2), 0, ',', '.') }}</div>
+                        <div class="stat-delta text-truncate" style="color:var(--color-text-secondary); display:block; max-width:180px;" title="Data realtime dari API Sync">
+                            Real-time dari API Sync
+                        </div>
                     </div>
-                </div>
-                <div class="stat">
-                    <div class="stat-label"><i class="ti ti-activity" aria-hidden="true"></i> Volume 24 Jam</div>
-                    <div class="stat-val">$18.2K</div>
-                    <div class="stat-delta up"><i class="ti ti-trending-up" style="font-size:10px;" aria-hidden="true"></i> +12.4%</div>
-                </div>
                 <div class="stat">
                     <div class="stat-label"><i class="ti ti-clock" aria-hidden="true"></i> Matriks Penilaian</div>
                     <div class="stat-val">{{ $totalPenilaian }}</div>
@@ -363,7 +368,7 @@
                         $persentase = $maxPenilaian > 0 ? round(($totalPenilaian / $maxPenilaian) * 100, 0) : 0;
                     @endphp
                     <div class="stat-delta {{ $persentase == 100 ? 'up' : 'text-warning' }} fw-bold">
-                        {{ $persentase }}% Terisi[cite: 2]
+                        {{ $persentase }}% Terisi
                     </div>
                 </div>
             </div>
@@ -373,7 +378,7 @@
                     <div class="card-head">
                         <div>
                             <div class="card-title">Ranking Investasi Aset In-Game</div>
-                            <div class="card-sub">Diurutkan berdasarkan nilai kedekatan relatif solusi ideal ($V_i$)[cite: 2]</div>
+                            <div class="card-sub">Diurutkan berdasarkan nilai kedekatan relatif solusi ideal (vi)</div>
                         </div>
                         <span class="badge b-teal">Live</span>
                     </div>

@@ -101,6 +101,17 @@
 
         .btn-logout { border-radius: 10px; transition: all 0.2s ease; }
         .btn-logout:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(220, 53, 69, 0.2); }
+
+        /* Scrollbar sinkron dengan dashboard (menyatu dengan background) */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: var(--color-background-primary); }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 212, 255, 0.15); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 212, 255, 0.35); }
+        [data-theme="light"] ::-webkit-scrollbar-track,
+        .light ::-webkit-scrollbar-track { background: #f1f5f9; }
+        [data-theme="light"] ::-webkit-scrollbar-thumb,
+        .light ::-webkit-scrollbar-thumb { background: rgba(15,23,42,0.12); }
+        html { scrollbar-width: thin; scrollbar-color: rgba(0,212,255,0.15) var(--color-background-primary); }
     </style>
 </head>
 

@@ -237,6 +237,25 @@
         color: #fff;
         box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
     }
+    .btn-edit-crit {
+        background: rgba(0, 212, 255, 0.1);
+        color: var(--accent-cyan);
+        border: 0.5px solid rgba(0, 212, 255, 0.2);
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .btn-edit-crit:hover {
+        background: var(--accent-cyan);
+        color: #fff;
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
+    }
 </style>
 
 <!-- 🛠️ UPGRADED HEADER: Search & Connect Wallet Dihilangkan Rapi -->
@@ -339,6 +358,9 @@
                                     <span class="fw-bold px-2 py-1 rounded" style="{{ $badgeStyle }} font-size: 12px; font-family: monospace;" id="badge-{{ $k->kode_kriteria }}">
                                         {{ $k->bobot }}%
                                     </span>
+                                    <a href="{{ route('kriteria.edit', $k->id) }}" class="btn-edit-crit" title="Edit Kriteria">
+                                        <i class="ti ti-edit"></i>
+                                    </a>
                                     <button type="button" class="btn-delete-crit" onclick="confirmDelete('{{ $k->id }}', '{{ $k->nama_kriteria }}')" title="Hapus Kriteria">
                                         <i class="ti ti-trash"></i>
                                     </button>

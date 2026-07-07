@@ -299,28 +299,36 @@
                         <span>24:00</span>
                     </div>
 
-                    @php
-                        $c1 = $kriterias->where('kode_kriteria', 'C1')->first();
-                        $c2 = $kriterias->where('kode_kriteria', 'C2')->first();
-                        $valC1 = $c1 ? ($aset->penilaians->where('kriteria_id', $c1->id)->first()?->nilai ?? 0) : 0;
-                        $valC2 = $c2 ? ($aset->penilaians->where('kriteria_id', $c2->id)->first()?->nilai ?? 0) : 0;
-                        $coin = $aset->jenis_aset === 'opensea' ? 'ETH' : 'USD';
-                    @endphp
-                    <div class="row text-center font-mono g-2">
-                        <div class="col-4 border-end" style="border-color: var(--color-border-tertiary)!important;">
-                            <p class="text-muted text-uppercase mb-1" style="font-size: 10px; tracking-wider">Floor Price</p>
-                            <span class="fw-bold" style="font-size: 15px; color: var(--color-text-primary);">{{ round($valC1, 2) }} {{ $coin }}</span>
-                        </div>
-                        <div class="col-4 border-end" style="border-color: var(--color-border-tertiary)!important;">
-                            <p class="text-muted text-uppercase mb-1" style="font-size: 10px; tracking-wider">24h Change</p>
-                            <span class="text-success fw-bold" style="font-size: 15px;">+{{ rand(3, 12) }}.{{ rand(1,9) }}%</span>
-                        </div>
-                        <div class="col-4">
-                            <p class="text-muted text-uppercase mb-1" style="font-size: 10px; tracking-wider">Vol. (30d)</p>
-                            <span class="fw-bold" style="font-size: 15px; color: var(--color-text-primary);">{{ number_format(round($valC2, 2), 0, ',', '.') }} {{ $coin }}</span>
-                        </div>
-                    </div>
-                </div>
+                     @php
+                         $c1 = $kriterias->where('kode_kriteria', 'C1')->first();
+                         $c2 = $kriterias->where('kode_kriteria', 'C2')->first();
+                         $valC1 = $c1 ? ($aset->penilaians->where('kriteria_id', $c1->id)->first()?->nilai ?? 0) : 0;
+                         $valC2 = $c2 ? ($aset->penilaians->where('kriteria_id', $c2->id)->first()?->nilai ?? 0) : 0;
+                         $coin = $aset->jenis_aset === 'opensea' ? 'ETH' : 'USD';
+                         
+                         $rawData = json_decode($aset->raw_data, true) ?? [];
+                         $previousFloor = $rawData['previous_floor_price'] ?? 0;
+                         $changeSinceLast = $previousFloor > 0 && $valC1 > 0 ? (($valC1 - $previousFloor) / $previousFloor) * 100 : 0;
+                         $changeColor = $changeSinceLast >= 0 ? 'text-success' : ($changeSinceLast < 0 ? 'text-danger' : 'text-muted');
+                         $changeSign = $changeSinceLast >= 0 ? '+' : '';
+                     @endphp
+                     <div class="row text-center font-mono g-2">
+                         <div class="col-4 border-end" style="border-color: var(--color-border-tertiary)!important;">
+                             <p class="text-muted text-uppercase mb-1" style="font-size: 10px; tracking-wider">Floor Price</p>
+                             <span class="fw-bold" style="font-size: 15px; color: var(--color-text-primary);">{{ round($valC1, 2) }} {{ $coin }}</span>
+                         </div>
+                         <div class="col-4 border-end" style="border-color: var(--color-border-tertiary)!important;">
+                             <p class="text-muted text-uppercase mb-1" style="font-size: 10px; tracking-wider">1d Floor</p>
+                             <span class="fw-bold {{ $changeColor }}" style="font-size: 15px;">
+                                 {{ $previousFloor > 0 ? $changeSign . number_format($changeSinceLast, 1) . '%' : '-' }}
+                             </span>
+                         </div>
+                         <div class="col-4">
+                             <p class="text-muted text-uppercase mb-1" style="font-size: 10px; tracking-wider">Vol. (24h)</p>
+                             <span class="fw-bold" style="font-size: 15px; color: var(--color-text-primary);">{{ number_format(round($valC2, 2), 0, ',', '.') }} {{ $coin }}</span>
+                         </div>
+                      </div>
+                 </div>
 
                 <div class="row g-3 text-center font-mono">
                     <div class="col-6 col-sm-3">

@@ -188,6 +188,23 @@ class MarketplaceApiService
             $existingAset = AsetDigital::where('nama_aset', $apiData['item_name'])->first();
             $kriterias = Kriteria::all()->keyBy('kode_kriteria');
 
+            // Ambil harga floor LAMA sebelum di-update (untuk kalkulasi % change 1d)
+            $previousFloorPrice = 0;
+            $initialFloorPrice = 0;
+            if ($existingAset && isset($kriterias['C1'])) {
+                $oldPenilaian = Penilaian::where('aset_digital_id', $existingAset->id)
+                    ->where('kriteria_id', $kriterias['C1']->id)
+                    ->first();
+                $previousFloorPrice = $oldPenilaian ? $oldPenilaian->nilai : 0;
+            }
+
+            $existingRawData = json_decode($existingAset->raw_data ?? '{}', true) ?: [];
+            if (isset($existingRawData['initial_floor_price']) && $existingRawData['initial_floor_price'] > 0) {
+                $initialFloorPrice = $existingRawData['initial_floor_price'];
+            } else {
+                $initialFloorPrice = $previousFloorPrice;
+            }
+
             // 🚀 PROTEKSI 2: Pengecekan Kriteria C1 (Harga Beli) agar tidak menjadi 0
             $hargaBeliLive = $apiData['harga_beli'] ?? 0;
             if ($hargaBeliLive <= 0 && $existingAset && isset($kriterias['C1'])) {
@@ -216,6 +233,11 @@ class MarketplaceApiService
             }
 
             // Buat atau update induk AsetDigital
+            $rawDataFinal = array_merge($apiData['raw_data'] ?? [], [
+                'previous_floor_price' => $previousFloorPrice,
+                'initial_floor_price' => $initialFloorPrice,
+                'sync_timestamp' => now()->toDateTimeString(),
+            ]);
             $aset = AsetDigital::updateOrCreate(
                 [
                     'nama_aset' => $apiData['item_name'],
@@ -224,7 +246,7 @@ class MarketplaceApiService
                 [
                     'platform_url' => $apiData['url'] ?? null,
                     'foto_url' => $fotoUrlFinal,
-                    'raw_data' => json_encode($apiData['raw_data'] ?? [])
+                    'raw_data' => json_encode($rawDataFinal)
                 ]
             );
 
@@ -250,10 +272,17 @@ class MarketplaceApiService
                 }
             }
 
+            $apiLive = ($hargaBeliLive > 0 || $volumeLive > 0 || $liquidityLive > 0);
+
             return [
                 'success' => true,
-                'message' => "Data {$aset->nama_aset} berhasil diperbarui dengan protektor data aman.",
+                'api_live' => $apiLive,
+                'message' => $apiLive
+                    ? "Data {$aset->nama_aset} diperbarui dari API live."
+                    : "Data {$aset->nama_aset} diperbarui (fallback cadangan, API tidak memberikan nilai valid).",
                 'aset_id' => $aset->id,
+                'harga_beli' => $hargaBeli,
+                'volume_24h' => $volume24h,
                 'data' => $apiData
             ];
         } catch (\Exception $e) {

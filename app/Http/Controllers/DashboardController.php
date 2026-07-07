@@ -98,6 +98,13 @@ class DashboardController extends Controller
         // 9. Kriteria dari database untuk sidebar
         $kriterias = \App\Models\Kriteria::all();
 
+        // 10. Total volume 24 jam dari data C2 (Volume Transaksi)
+        $c2Kriteria = $kriterias->where('kode_kriteria', 'C2')->first();
+        $totalVolume24h = 0;
+        if ($c2Kriteria) {
+            $totalVolume24h = Penilaian::where('kriteria_id', $c2Kriteria->id)->sum('nilai');
+        }
+
         return view('dashboard', compact(
             'totalKriteria',
             'totalAsetDigital',
@@ -107,7 +114,8 @@ class DashboardController extends Controller
             'tickerAsets',
             'daftarRanking',
             'distribusiPlatform',
-            'kriterias'
+            'kriterias',
+            'totalVolume24h'
         ));
     }
 }

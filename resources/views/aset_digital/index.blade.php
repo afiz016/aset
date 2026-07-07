@@ -321,12 +321,27 @@
                                     <p style="color: var(--color-text-secondary); font-size: 11px;" class="mb-0 text-uppercase">{{ $aset->jenis_aset }} • Collection</p>
                                 </div>
                                 <div class="text-end">
-                                    @if($loop->index % 2 == 0)
-                                        <span class="text-success font-mono fw-bold" style="font-size: 12px;">+{{ rand(2, 14) }}.{{ rand(1, 9) }}%</span>
+                                    @php
+                                        $rawData = json_decode($aset->raw_data, true) ?? [];
+                                        $previousFloor = $rawData['previous_floor_price'] ?? 0;
+                                        $c1Kriteria = $kriterias->where('kode_kriteria', 'C1')->first();
+                                        $pC1 = $c1Kriteria ? $aset->penilaians->where('kriteria_id', $c1Kriteria->id)->first() : null;
+                                        $nilaiC1 = $pC1 ? $pC1->nilai : 0;
+                                        
+                                        $changeSinceLast = $previousFloor > 0 && $nilaiC1 > 0 ? (($nilaiC1 - $previousFloor) / $previousFloor) * 100 : 0;
+                                        $changeColor = $changeSinceLast >= 0 ? 'text-success' : ($changeSinceLast < 0 ? 'text-danger' : 'text-muted');
+                                        $changeSign = $changeSinceLast >= 0 ? '+' : '';
+                                    @endphp
+                                    
+                                    @if($previousFloor > 0)
+                                        <span class="font-mono fw-bold {{ $changeColor }}" style="font-size: 12px;">
+                                            {{ $changeSign }}{{ number_format($changeSinceLast, 1) }}%
+                                        </span>
+                                        <p class="text-uppercase m-0 text-muted" style="font-size: 9px; tracking-wider">1d Floor</p>
                                     @else
-                                        <span class="text-danger font-mono fw-bold" style="font-size: 12px;">-{{ rand(1, 4) }}.{{ rand(1, 9) }}%</span>
+                                        <span class="text-muted font-mono fw-bold" style="font-size: 12px;">0.0%</span>
+                                        <p class="text-uppercase m-0 text-muted" style="font-size: 9px; tracking-wider">1d Floor</p>
                                     @endif
-                                    <p class="text-uppercase m-0 text-muted" style="font-size: 9px; tracking-wider">24h Vol</p>
                                 </div>
                             </div>
                         </div>
@@ -417,17 +432,23 @@
             btnSync.addEventListener('click', function() {
                 btnSync.disabled = true;
                 btnSync.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Menghubungkan API...`;
-                
+
                 fetch("{{ route('aset-digital.sync') }}")
                     .then(response => response.json())
                     .then(data => {
-                        if(data.success) {
-                            alert('✓ Sukses: ' + data.message);
-                            window.location.reload();
-                        } else {
-                            alert('❌ Gagal menyinkronkan data.');
-                            window.location.reload();
+                        let msg = data.message + '\n\n';
+                        if (data.results && data.results.length > 0) {
+                            data.results.forEach(r => {
+                                const status = r.success ? '✓' : '✗';
+                                const src = r.api_live ? '🟢 API Live' : '🟡 Fallback';
+                                const detail = r.success
+                                    ? `Harga: ${r.harga_beli} | Vol: ${r.volume_24h} | ${src}`
+                                    : `Error: ${r.message}`;
+                                msg += `${status} ${r.nama_aset} (${r.platform})\n   ${detail}\n`;
+                            });
                         }
+                        alert(msg);
+                        window.location.reload();
                     })
                     .catch(error => {
                         console.error('Error:', error);

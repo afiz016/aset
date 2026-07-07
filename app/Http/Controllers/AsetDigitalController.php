@@ -94,33 +94,53 @@ class AsetDigitalController extends Controller
 
     public function syncData()
     {
-    $asets = AsetDigital::all();
-    $successCount = 0;
+        $asets = AsetDigital::all();
+        $results = [];
+        $successCount = 0;
 
-    foreach ($asets as $aset) {
-        $data = null;
-        $platform = strtolower($aset->jenis_aset);
+        foreach ($asets as $aset) {
+            $data = null;
+            $platform = strtolower($aset->jenis_aset);
 
-        // Deteksi jenis aset berdasarkan platform
-        if ($platform === 'opensea') {
-            $data = MarketplaceApiService::fetchOpenSeaData($aset->nama_aset);
-        } elseif ($platform === 'steam market' || $platform === 'steam') {
-            // Kita asumsikan App ID disimpan atau default CS2 (730) untuk kebutuhan instan
-            $data = MarketplaceApiService::fetchSteamMarketData('730', $aset->nama_aset);
-        }
-
-        // Jika data berhasil ditarik, lakukan pembaharuan matriks kriteria
-        if ($data && !isset($data['error'])) {
-            $result = MarketplaceApiService::saveAsetFromAPI($data);
-            if ($result['success']) {
-                $successCount++;
+            if ($platform === 'opensea') {
+                $data = MarketplaceApiService::fetchOpenSeaData($aset->nama_aset);
+            } elseif ($platform === 'steam market' || $platform === 'steam') {
+                $data = MarketplaceApiService::fetchSteamMarketData('730', $aset->nama_aset);
             }
-        }
-    }
 
-    return response()->json([
-        'success' => true,
-        'message' => $successCount . ' aset digital berhasil diperbarui dengan data pasar terbaru!'
-    ]);
+            $itemResult = [
+                'nama_aset' => $aset->nama_aset,
+                'platform' => $platform,
+                'success' => false,
+                'harga_beli' => 0,
+                'volume_24h' => 0,
+                'api_live' => false,
+                'message' => '',
+            ];
+
+            if ($data && !isset($data['error'])) {
+                $saveResult = MarketplaceApiService::saveAsetFromAPI($data);
+                $itemResult['harga_beli'] = $data['harga_beli'] ?? 0;
+                $itemResult['volume_24h'] = $data['volume_24h'] ?? 0;
+                $itemResult['success'] = $saveResult['success'] ?? false;
+                $itemResult['api_live'] = $saveResult['api_live'] ?? false;
+                $itemResult['message'] = $saveResult['message'] ?? '';
+                if ($saveResult['success']) {
+                    $successCount++;
+                }
+            } elseif ($data && isset($data['error'])) {
+                $itemResult['message'] = $data['error'];
+            } else {
+                $itemResult['message'] = 'Platform tidak didukung';
+            }
+
+            $results[] = $itemResult;
+        }
+
+        return response()->json([
+            'success' => $successCount > 0,
+            'message' => "{$successCount}/" . count($asets) . " aset berhasil disinkronkan.",
+            'results' => $results
+        ]);
     }
 }
