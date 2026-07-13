@@ -13,9 +13,9 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Seed Parameter Kriteria TOPSIS
         // Mendefinisikan kriteria dan bobotnya (C1-C5)
-        $kriteria_c1 = Kriteria::create(['kode_kriteria' => 'C1', 'nama_kriteria' => 'Harga Beli Saat Ini', 'bobot' => 25, 'jenis' => 'cost']);
+        $kriteria_c1 = Kriteria::create(['kode_kriteria' => 'C1', 'nama_kriteria' => 'Harga Beli Saat Ini', 'bobot' => 20, 'jenis' => 'cost']);
         $kriteria_c2 = Kriteria::create(['kode_kriteria' => 'C2', 'nama_kriteria' => 'Volume Transaksi (24 Jam)', 'bobot' => 20, 'jenis' => 'benefit']);
-        $kriteria_c3 = Kriteria::create(['kode_kriteria' => 'C3', 'nama_kriteria' => 'Tingkat Kelangkaan (Rarity)', 'bobot' => 20, 'jenis' => 'benefit']);
+        $kriteria_c3 = Kriteria::create(['kode_kriteria' => 'C3', 'nama_kriteria' => 'Tingkat Kelangkaan (Rarity)', 'bobot' => 25, 'jenis' => 'benefit']);
         $kriteria_c4 = Kriteria::create(['kode_kriteria' => 'C4', 'nama_kriteria' => 'Market Sentiment', 'bobot' => 15, 'jenis' => 'benefit']);
         $kriteria_c5 = Kriteria::create(['kode_kriteria' => 'C5', 'nama_kriteria' => 'Tingkat Likuiditas', 'bobot' => 20, 'jenis' => 'benefit']);
 
